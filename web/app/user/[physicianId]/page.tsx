@@ -11,6 +11,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Smith",
         email: "john.smith@example.com",
         lastUpdated: "2024-02-15T09:30:00Z",
+        verified: true,
       },
       {
         id: 2,
@@ -18,6 +19,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Johnson",
         email: "sarah.j@example.com",
         lastUpdated: "2024-02-14T15:45:00Z",
+        verified: true,
       },
       {
         id: 3,
@@ -25,6 +27,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Rodriguez",
         email: "mrodriguez@example.com",
         lastUpdated: "2024-02-13T11:20:00Z",
+        verified: true,
       },
       {
         id: 4,
@@ -32,6 +35,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Wilson",
         email: "emma.w@example.com",
         lastUpdated: "2024-02-12T16:15:00Z",
+        verified: true,
       },
       {
         id: 5,
@@ -39,6 +43,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Wei",
         email: "chen.wei@example.com",
         lastUpdated: "2024-02-11T08:45:00Z",
+        verified: true,
       },
       {
         id: 6,
@@ -46,6 +51,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Patel",
         email: "priya.p@example.com",
         lastUpdated: "2024-02-10T14:30:00Z",
+        verified: true,
       },
       {
         id: 7,
@@ -53,6 +59,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Thompson",
         email: "alex.t@example.com",
         lastUpdated: "2024-02-09T10:20:00Z",
+        verified: true,
       },
       {
         id: 8,
@@ -60,6 +67,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Garcia",
         email: "mgarcia@example.com",
         lastUpdated: "2024-02-08T13:15:00Z",
+        verified: false,
       },
       {
         id: 9,
@@ -67,6 +75,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Wilson",
         email: "jwilson@example.com",
         lastUpdated: "2024-02-07T17:40:00Z",
+        verified: false,
       },
       {
         id: 10,
@@ -74,6 +83,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Anderson",
         email: "lisa.a@example.com",
         lastUpdated: "2024-02-06T12:10:00Z",
+        verified: false,
       },
       {
         id: 11,
@@ -81,6 +91,7 @@ async function getData(): Promise<Patient[]> {
         lastName: "Kim",
         email: "dkim@example.com",
         lastUpdated: "2024-02-05T09:55:00Z",
+        verified: false,
       }
     // ...
   ];

@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { MoreHorizontal } from "lucide-react"
+import { MoreHorizontal } from "lucide-react";
 
-import type { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import type { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,15 +12,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
 export type Patient = {
-  id: number
-  firstName: string
-  lastName: string
-  email: string
-  lastUpdated: string
-}
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  lastUpdated: string;
+  verified: boolean;
+};
 
 export const columns: ColumnDef<Patient>[] = [
   {
@@ -35,7 +36,7 @@ export const columns: ColumnDef<Patient>[] = [
           First Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
   },
   {
@@ -50,7 +51,7 @@ export const columns: ColumnDef<Patient>[] = [
           Last Name
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
     },
   },
   {
@@ -69,14 +70,42 @@ export const columns: ColumnDef<Patient>[] = [
           Last Updated
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
-      )
+      );
+    },
+  },
+  {
+    accessorKey: "verified",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="pl-0"
+        >
+          Registration Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const patient = row.original;
+
+      return (
+        <div>
+          {patient.verified ? (
+            <span className="text-green-500">Registered</span>
+          ) : (
+            <span className="text-red-500">Unregistered</span>
+          )}
+        </div>
+      );
     },
   },
   {
     id: "actions",
     cell: ({ row }) => {
-      const patient = row.original
- 
+      const patient = row.original;
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -88,7 +117,7 @@ export const columns: ColumnDef<Patient>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-            // TODO: do a fetch to a UPDATE endpoint
+              // TODO: do a fetch to a UPDATE endpoint
               onClick={() => navigator.clipboard.writeText(`${patient.id}`)}
               className="font-bold"
             >
@@ -96,7 +125,7 @@ export const columns: ColumnDef<Patient>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
-            // TODO: do a fetch to a DELETE endpoint
+              // TODO: do a fetch to a DELETE endpoint
               onClick={() => navigator.clipboard.writeText(`${patient.id}`)}
               className="text-red-500 font-bold"
             >
@@ -104,7 +133,7 @@ export const columns: ColumnDef<Patient>[] = [
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      )
+      );
     },
   },
-]
+];
