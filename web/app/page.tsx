@@ -1,4 +1,3 @@
-// import Image from "next/image";
 import { Hero } from "@/components/ui/home/hero";
 import { About } from "@/components/ui/home/about";
 import { GettingStarted } from "@/components/ui/home/getting-started";

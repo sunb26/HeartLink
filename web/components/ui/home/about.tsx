@@ -5,7 +5,7 @@ export function About() {
     <div className="bg-off-white p-20">
       <div className="flex flex-col bg-[#C4C4C4] py-20 items-center gap-6">
         <p className="font-[Syne]">Welcome to HeartLink</p>
-        <h1 className="text-5xl font-[Playfair Display SC] font-bold">
+        <h1 className="text-4xl md:text-5xl font-[Playfair Display SC] font-bold">
           Revolutionizing Low-Cost Telemedicine Solutions
         </h1>
         <p className="font-[Syne]">

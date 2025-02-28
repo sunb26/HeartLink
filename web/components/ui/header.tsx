@@ -21,7 +21,7 @@ export function Header() {
         <div className="font-bold cursor-pointer">
           {/* biome-ignore lint/a11y/useValidAnchor: */}
           <a onClick={() => handleNavigation("/")}>
-            <h1 className="text-2xl">HeartLink</h1>
+            <h1 className="text-2xl font-[Syne]">HeartLink</h1>
           </a>
         </div>
         <ul className="flex gap-6 items-center">

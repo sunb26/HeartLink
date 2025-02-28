@@ -95,7 +95,7 @@ export const columns: ColumnDef<Patient>[] = [
           {patient.verified ? (
             <span className="text-green-500">Registered</span>
           ) : (
-            <span className="text-red-500">Unregistered</span>
+            <span className="text-red-500">Pending...</span>
           )}
         </div>
       );
