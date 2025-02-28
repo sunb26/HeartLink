@@ -1,9 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"
-
-import * as React from "react"
+import { Input } from "@/components/ui/input";
+import * as React from "react";
 
 import {
   type ColumnDef,
@@ -15,7 +14,7 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table"
+} from "@tanstack/react-table";
 
 import {
   Table,
@@ -35,12 +34,10 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
-  )
-
-
+  );
   const table = useReactTable({
     data,
     columns,
@@ -54,8 +51,6 @@ export function DataTable<TData, TValue>({
       sorting,
       columnFilters,
     },
-    
-
   });
 
   return (
@@ -95,6 +90,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="cursor-pointer hover:bg-gray-100 transition"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
