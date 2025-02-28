@@ -9,48 +9,41 @@ import (
 	"heartlinkServer/endpoint1Pkg" // import the endpoint1Pkg package from within the heartlinkServer project
 	"heartlinkServer/endpoint2Pkg" // import the endpoint2Pkg package from within the heartlinkServer project
 	"log"                          // "log" package is used to log errors
-
-	// package is used to create/connect to a server
-	"net/http" // "net/http" package provides HTTP client/server implementations
+	"net/http"                     // "net/http" package provides HTTP client/server implementations
 )
-
-const keyServerAddr = "serverAddr" // const string used as key
 
 func main() {
 
-	log.Println("Begin main function") // log initial message to console
+	log.Println("Begin main function")
 
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
-	// each individual HandleFunc function is used to handle a specific endpoint (URL path)
-	mux.HandleFunc("/endpoint1", endpoint1Pkg.GetEndpoint1)         // when a request is made to /endpoint1, call GetEndpoint1() function
-	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1) // when a request is made to /endpoint2_1, call Endpoint2Function1() function
-	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2) // when a request is made to /endpoint2_2, call Endpoint2Function2() function
+	// each individual HandleFunc is used to handle a specific endpoint
+	mux.HandleFunc("/endpoint1", endpoint1Pkg.GetEndpoint1)
+	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1)
+	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2)
 
 	ctx := context.Background()
 
+	// define the http server
 	server := &http.Server{
-		Addr: ":8080",
-		// Addr: "127.0.0.1:8080",
+		Addr:    ":8080", // can use this as address to run locally or on hosted server
 		Handler: mux,
-		// BaseContext: func(l net.Listener) context.Context {
-		// 	ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
-		// 	return ctx
-		// },
-		// BaseContext: ,
+
 		// Add in a ReadTimeout, WriteTimeout, and IdleTimeout
 	}
 
-	error := server.ListenAndServe() // create and start server on localhost:8080 handling requests using "mux" multiplexer
+	error := server.ListenAndServe() // starts http server, saves any resulting errors
 
+	// check if error is that server is closed or some other error
 	if errors.Is(error, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
 	} else if error != nil {
 		fmt.Printf("error listening for server: %s\n", error)
 	}
 
-	<-ctx.Done() // wait for context to be done
+	<-ctx.Done() // waiting indefinitely for ctx to be cancelled (should never happen)
 
-	log.Println("End main function (should never make it here because kill file when running)") // log exit message to console
+	log.Println("End main function") // this should never be printed
 
 }
