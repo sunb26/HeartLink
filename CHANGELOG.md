@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.15.0 (2204-02-28)
+  - DB schema v2
+  
 ## 1.14.0 (2025-02-21)
 - server now hosted on google cloud via cloud run 
 
