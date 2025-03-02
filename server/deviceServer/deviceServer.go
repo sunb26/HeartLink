@@ -16,36 +16,6 @@ type requestBody struct { // CAN ADD "STRUCT TAGS" TO THIS IF WILL HELP WITH DEC
 	WavFileBytes []byte // byte array -> a slice of uint8 values
 }
 
-// SEE IF BETTER WAY THAN REDEFINING THIS AGAIN
-// const keyServerAddr = "serverAddr" // const string used as key
-
-// GetEndpoint1 function (WILL DELETE)
-func GetEndpoint1(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Start heartlinkServer endpoint1\n\n") // Write start message to response writer "w"
-
-	// ctx := r.Context() // r.Context used to access the context of the request
-
-	// r.URL.Query used to access the query parameters in the URL
-	hasFirst := r.URL.Query().Has("first") // the Has method checks if a query parameter exists (returns Bool)
-	first := r.URL.Query().Get("first")    // the Get method retrieves the value of a query parameter (returns String)
-	hasSecond := r.URL.Query().Has("second")
-	second := r.URL.Query().Get("second")
-
-	// Printf writes the arguments extracted from URL to the console
-	fmt.Printf("getEndpoint1 arguments: first(%t)=%s, second(%t)=%s\n",
-		// ctx.Value(keyServerAddr),
-		hasFirst, first,
-		hasSecond, second)
-
-	// Fprintf writes the arguments extracted from URL to the response writer "w"
-	fmt.Fprintf(w, "getEndpoint1 arguments: first(%t)=%s, second(%t)=%s\n",
-		// ctx.Value(keyServerAddr),
-		hasFirst, first,
-		hasSecond, second)
-
-	fmt.Fprint(w, "End heartlinkServer endpoint1\n") // Write end message to response writer "w"
-}
-
 // POSTRawAudioFile function
 func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n\n") // Write start message to response writer "w"

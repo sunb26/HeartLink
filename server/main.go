@@ -19,8 +19,8 @@ func main() {
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
 	// each individual HandleFunc is used to handle a specific endpoint
-	mux.HandleFunc("/endpoint1", deviceServer.GetEndpoint1) // TESTING
 	mux.HandleFunc("/POSTRawAudioFile", deviceServer.POSTRawAudioFile)
+	mux.HandleFunc("/endpoint1", endpoint2Pkg.GetEndpoint1)         // TESTING
 	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1) // TESTING
 	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2) // TESTING
 
