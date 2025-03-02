@@ -6,8 +6,8 @@ import (
 	"context"                      // package is used to pass context between functions
 	"errors"                       // package is used to handle errors
 	"fmt"                          // package is used to print to console in a specific format
-	"heartlinkServer/endpoint1Pkg" // import the endpoint1Pkg package from within the heartlinkServer project
-	"heartlinkServer/endpoint2Pkg" // import the endpoint2Pkg package from within the heartlinkServer project
+	"heartlinkServer/deviceServer" // import the deviceServer package from within the heartlinkServer project
+	"heartlinkServer/endpoint2Pkg" // TESTING
 	"log"                          // "log" package is used to log errors
 	"net/http"                     // "net/http" package provides HTTP client/server implementations
 )
@@ -19,9 +19,10 @@ func main() {
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
 	// each individual HandleFunc is used to handle a specific endpoint
-	mux.HandleFunc("/endpoint1", endpoint1Pkg.GetEndpoint1)
-	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1)
-	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2)
+	mux.HandleFunc("/endpoint1", deviceServer.GetEndpoint1) // TESTING
+	mux.HandleFunc("/POSTRawAudioFile", deviceServer.POSTRawAudioFile)
+	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1) // TESTING
+	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2) // TESTING
 
 	ctx := context.Background()
 
