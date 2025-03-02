@@ -7,5 +7,8 @@ xcuserdata/*
 # Ignore build artifacts
 build/
 
+# Ignore environments 
+.env
+
 iOS/HeartLink/HeartLink/GoogleService-Info.plist
 iOS/HeartLink/HeartLink/Info.plist
