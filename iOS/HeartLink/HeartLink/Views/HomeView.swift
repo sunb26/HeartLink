@@ -62,7 +62,7 @@ struct HomeView: View {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 40, height: 40)
-                                .foregroundColor(.pink)
+                                .foregroundColor(Color("custom-red"))
 
                             VStack(alignment: .leading) {
                                 Text(recording.date)

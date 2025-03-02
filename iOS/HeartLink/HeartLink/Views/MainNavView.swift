@@ -31,7 +31,7 @@ struct MainNavView: View {
                 }
             }
             .tabViewStyle(.sidebarAdaptable)
-            .tint(.pink)
+            .tint(Color("custom-red"))
             .edgesIgnoringSafeArea(.all)
             .navigationDestination(for: PageActions.self) { action in
                 switch action {

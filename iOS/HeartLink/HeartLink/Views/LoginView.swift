@@ -25,7 +25,8 @@ struct LoginView: View {
                     Image("logo")
                         .resizable()
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 200, height: 200)
+                        .frame(width: 250, height: 250)
+                    // #d32f2f
                 }
                 .padding(.bottom, 50)
 
@@ -64,7 +65,7 @@ struct LoginView: View {
                             Text("Login")
                                 .padding()
                                 .frame(maxWidth: .infinity)
-                                .background(Color.pink)
+                                .background(Color("custom-red"))
                                 .foregroundColor(.white)
                                 .cornerRadius(8)
                                 .shadow(color: .gray, radius: 5, x: 0, y: 2)
