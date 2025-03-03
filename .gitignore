@@ -10,5 +10,8 @@ build/
 # Ignore environments 
 .env
 
+# Ignore config directory
+config/
+
 iOS/HeartLink/HeartLink/GoogleService-Info.plist
 iOS/HeartLink/HeartLink/Info.plist

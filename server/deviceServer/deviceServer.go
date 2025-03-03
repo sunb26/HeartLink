@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"heartlinkServer/firebasedb"
 	"io"
 	"log"
 	"net/http"
@@ -68,6 +69,14 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "wavFileBytes: ", req.WavFileBytes[0], "\n")   // Write wavFileBytes to response writer "w"
 	fmt.Fprint(w, "wavFileBytes: ", req.WavFileBytes[1], "\n\n") // second byte in wavFileBytes
 	// fmt.Fprint(w, "wavFileBytes: ", string(wavFileBytes), "\n\n") // Write wavFileBytes to response writer "w"
+
+	/* establishing firebase connection */
+
+	errFB := firebasedb.FirebaseDB().Connect() // connect to firebase database
+	if errFB != nil {
+		log.Println(errFB)
+		return
+	}
 
 	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n") // Write end message to response writer "w"
 }
