@@ -100,7 +100,7 @@ struct RecLogView: View {
                                 }
                             }
                         }
-                    } else if recording.viewStatus == "submitted" {
+                    } else if recording.viewStatus == "pending" {
                         HStack {
                             Text("View Status:")
                             Text("Submitted - Under Review")

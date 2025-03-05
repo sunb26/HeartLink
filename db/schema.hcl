@@ -108,6 +108,11 @@ table "recordings" {
     null = false
     type = text
   }
+  column "status" {
+    null    = false
+    type    = enum.view_status
+    default = "notSubmitted"
+  }
   primary_key {
     columns = [column.recording_id]
   }
@@ -121,6 +126,10 @@ table "recordings" {
 enum "sex" {
   schema = schema.public
   values = ["M", "F", "NB"]
+}
+enum "view_status" {
+  schema = schema.public
+  values = ["notSubmitted", "pending", "viewed"]
 }
 schema "public" {
   comment = "standard public schema"
