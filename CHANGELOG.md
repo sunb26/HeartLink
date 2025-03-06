@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.16.1 (2025-03-06)
+- update patient table text colours and header titles
+
 ## 1.16.0 (2025-03-05)
 - add comments submission box on website
 - add indication for patients with unviewed recordings to user web homepage
