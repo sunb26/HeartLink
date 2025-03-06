@@ -83,7 +83,7 @@ export const columns: ColumnDef<Patient>[] = [
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           className="pl-0"
         >
-          Registration Status
+          Patient Registration Status
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -94,9 +94,9 @@ export const columns: ColumnDef<Patient>[] = [
       return (
         <div>
           {patient.verified ? (
-            <span className="text-green-500">Registered</span>
+            <span className="text-black">Registered</span>
           ) : (
-            <span className="text-red-500">Pending...</span>
+            <span className="text-yellow-700">Pending...</span>
           )}
         </div>
       );
@@ -121,12 +121,16 @@ export const columns: ColumnDef<Patient>[] = [
 
       return (
         <div>
-          {patient.verified ? (patient.viewed ? (
-            <span className="text-gray-500">Up to Date</span>
+          {patient.verified ? (
+            patient.viewed ? (
+              <span className="text-gray-500">Up to Date</span>
+            ) : (
+              <span className="text-red-600 font-bold">Unviewed</span>
+            )
           ) : (
-            <span className="text-red-500">***</span>
-          )) : (
-            <span className="text-gray-500">N/A</span>
+            <div className="flex justify-center w-1/2">
+              <span className="text-gray-500">-</span>
+            </div>
           )}
         </div>
       );
