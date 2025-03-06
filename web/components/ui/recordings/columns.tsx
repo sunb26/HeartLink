@@ -9,6 +9,7 @@ import {
   DialogTrigger,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CommentForm } from "@/components/ui/recordings/form";
 
 export type Recording = {
   id: number;
@@ -40,12 +41,17 @@ export const columns: ColumnDef<Recording>[] = [
             </Button>
           </DialogTrigger>
           <DialogTitle>
-            <DialogContent className="sm:max-w-[425px]">
-              {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
-              <audio controls autoPlay>
-                <source src={row.original.url} type="audio/wav" />
-                Your browser does not support the audio element.
-              </audio>
+            <DialogContent className="max-w-[425px] pt-10">
+              <div className="bg-slate-400 p-8 rounded-lg">
+                {/* biome-ignore lint/a11y/useMediaCaption: heart sounds don't require CC */}
+                <audio controls>
+                  <source src={row.original.url} type="audio/wav" />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
+              <div className="grid w-full gap-4">
+                <CommentForm />
+              </div>
             </DialogContent>
           </DialogTitle>
         </Dialog>
