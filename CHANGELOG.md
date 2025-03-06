@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.16.0 (2025-03-05)
+- add comments submission box on website
+
 ## 1.15.1 (2025-03-01)
 - update iOS app color scheme
 
