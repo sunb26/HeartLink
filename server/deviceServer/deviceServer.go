@@ -19,7 +19,8 @@ type requestBody struct { // CAN ADD "STRUCT TAGS" TO THIS IF WILL HELP WITH DEC
 
 // POSTRawAudioFile function
 func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n\n") // Write start message to response writer "w"
+
+	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n\n")
 
 	r.Body = http.MaxBytesReader(w, r.Body, 1*1024*1024) // limit the size of the request body to 1 MB
 
@@ -57,8 +58,8 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	/* No parameters in POST endpoint to read */
-	// Fprintf writes the arguments extracted from URL to the response writer "w"
-	fmt.Fprintf(w, "POSTRawAudioFile arguments: N/A\n\n")
+
+	// --- extracting request body fields --- //
 
 	userID := req.UserID // extract userID from request body
 	// wavFileBytes := req.WavFileBytes // extract wavFileBytes from request body
@@ -70,13 +71,35 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "wavFileBytes: ", req.WavFileBytes[1], "\n\n") // second byte in wavFileBytes
 	// fmt.Fprint(w, "wavFileBytes: ", string(wavFileBytes), "\n\n") // Write wavFileBytes to response writer "w"
 
-	/* establishing firebase connection */
+	// --- POST request (from ESP32 to server) requirements --- //
 
-	errFB := firebasedb.FirebaseDB().Connect() // connect to firebase database
+	/*
+		1. no arguments in URL to extract
+		2. request body in JSON format with the following fields:
+			a. userID (string) - ESP32 should get this from app (via BT)
+			b. wavFileBytes (byte array) - however .wav file is broken down into bytes, send here
+		3. ESP32 will receive response from server (e.g. success code) to know worked
+	*/
+
+	// --- establishing firebase connection --- //
+
+	errFB := firebasedb.FirebaseDB().Connect() // connect to firebase storage
 	if errFB != nil {
 		log.Println(errFB)
 		return
 	}
 
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n") // Write end message to response writer "w"
+	// TEST firebase connection via "get all" call
+	testErr := firebasedb.FirebaseDB().GetAllFilesFirebase()
+	if testErr != nil {
+		log.Println(testErr)
+	}
+
+	// testWavFilepath := "testWavFile1.wav"                                                          // path to test wav file
+	// output := firebasedb.FirebaseDB().UploadWAVToFirebase(testWavFilepath, "recordings/test1.wav") // upload wav file to firebase storage
+	// if output != nil {
+	// 	log.Fatalf("Error uploading WAV file to Firebase Storage: %v", output)
+	// }
+
+	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n")
 }

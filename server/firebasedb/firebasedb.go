@@ -1,5 +1,4 @@
 // firebasedb.go file
-// code loosely derived from: https://medium.com/@vubon.roy/lets-integrate-the-firebase-realtime-database-with-golang-7c065a7b7313
 
 package firebasedb
 
@@ -11,9 +10,11 @@ import (
 	"path/filepath"
 	"runtime"
 
-	firebase "firebase.google.com/go"
 	"firebase.google.com/go/db"
+
+	"cloud.google.com/go/storage"
 	"github.com/joho/godotenv"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
 
@@ -21,42 +22,89 @@ type FireDB struct {
 	*db.Client
 }
 
-var fireDB FireDB // define struct instance globally
+var fireDB FireDB
+var bucket *storage.BucketHandle
+
+// UploadWAVToFirebase function
+func (db *FireDB) UploadWAVToFirebase(localFilePath, firebaseStoragePath string) error {
+
+	client := db.Client
+	fmt.Print("Client: ", client, "\n") // TESTING
+
+	fmt.Printf("Successfully uploaded %s to Firebase Storage at path: %s\n", localFilePath, firebaseStoragePath)
+	return nil
+
+}
+
+// TEST function (will use in other endpoints)
+func (db *FireDB) GetAllFilesFirebase() error {
+
+	directory := "recordings/" // hard coded (based on Firebase Storage structure)
+
+	ctx := context.Background()
+
+	query := &storage.Query{
+		Prefix:    directory,
+		Delimiter: "/",
+	}
+
+	var files []string
+	it := bucket.Objects(ctx, query)
+	for {
+		attrs, err := it.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Error iterating through bucket: %v", err)
+			return nil
+		}
+		files = append(files, attrs.Name)
+	}
+
+	fmt.Printf(`{"files": %q}`, files)
+
+	return nil
+
+}
 
 // connect to firebase database
 func (db *FireDB) Connect() error {
 
-	// Get the current file path
+	fmt.Printf("Connecting to Firebase Storage\n") // TESTING
+
+	// get current file path
 	_, currentFile, _, ok := runtime.Caller(0)
 	if !ok {
 		log.Fatalf("Unable to get current file info")
 	}
 
-	// Get the directory of the current file
+	// get root directory of current file (based on the current file strcuture)
 	rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile)))
 
-	errEnv := godotenv.Load(filepath.Join(rootDir, ".env")) // load environment variables from .env file
-	if errEnv != nil {
-		log.Fatalf("Error loading .env file: %v", errEnv)
+	// load environment variables from .env file
+	err := godotenv.Load(filepath.Join(rootDir, ".env"))
+	if err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
 	}
-	fmt.Print("GOOGLE_APPLICATION_CREDENTIALS: ", os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"), "\n") // TESTING
-	fmt.Print("FIREBASE_DATABASE_URL: ", os.Getenv("FIREBASE_DATABASE_URL"), "\n")                   // TESTING
 
 	ctx := context.Background()
 	opt := option.WithCredentialsFile(rootDir + os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-	config := &firebase.Config{DatabaseURL: os.Getenv("FIREBASE_DATABASE_URL")}
-	app, err := firebase.NewApp(ctx, config, opt)
-	// app, err := firebase.NewApp(ctx, nil)
+
+	client, err := storage.NewClient(ctx, opt)
 	if err != nil {
-		return fmt.Errorf("error initializing app: %v", err)
+		log.Fatalf("Failed to create client: %v", err)
 	}
 
-	client, err := app.Database(ctx)
+	bucket = client.Bucket(os.Getenv("FIREBASE_STORAGE_BUCKET"))
+
+	// check if bucket exists + created successfully
+	_, err = bucket.Attrs(ctx)
 	if err != nil {
-		return fmt.Errorf("error initializing database: %v", err)
+		log.Fatalf("Failed to get bucket attributes: %v", err)
 	}
 
-	db.Client = client
+	fmt.Printf("Successfully connected to Firebase Storage\n") // TESTING
 
 	return nil
 
