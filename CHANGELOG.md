@@ -2,6 +2,7 @@
 
 ## 1.16.0 (2025-03-05)
 - add comments submission box on website
+- add indication for patients with unviewed recordings to user web homepage
 
 ## 1.15.1 (2025-03-01)
 - update iOS app color scheme
