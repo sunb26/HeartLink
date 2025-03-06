@@ -21,6 +21,7 @@ export type Patient = {
   email: string;
   lastUpdated: string;
   verified: boolean;
+  viewed: boolean;
 };
 
 export const columns: ColumnDef<Patient>[] = [
@@ -96,6 +97,36 @@ export const columns: ColumnDef<Patient>[] = [
             <span className="text-green-500">Registered</span>
           ) : (
             <span className="text-red-500">Pending...</span>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "viewed",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="pl-0"
+        >
+          View Status
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const patient = row.original;
+
+      return (
+        <div>
+          {patient.verified ? (patient.viewed ? (
+            <span className="text-gray-500">Up to Date</span>
+          ) : (
+            <span className="text-red-500">***</span>
+          )) : (
+            <span className="text-gray-500">N/A</span>
           )}
         </div>
       );

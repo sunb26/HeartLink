@@ -12,6 +12,7 @@ async function getData(): Promise<Patient[]> {
         email: "john.smith@example.com",
         lastUpdated: "2024-02-15T09:30:00Z",
         verified: true,
+        viewed: true
       },
       {
         id: 2,
@@ -20,6 +21,7 @@ async function getData(): Promise<Patient[]> {
         email: "sarah.j@example.com",
         lastUpdated: "2024-02-14T15:45:00Z",
         verified: true,
+        viewed: true
       },
       {
         id: 3,
@@ -28,6 +30,7 @@ async function getData(): Promise<Patient[]> {
         email: "mrodriguez@example.com",
         lastUpdated: "2024-02-13T11:20:00Z",
         verified: true,
+        viewed: true
       },
       {
         id: 4,
@@ -36,6 +39,7 @@ async function getData(): Promise<Patient[]> {
         email: "emma.w@example.com",
         lastUpdated: "2024-02-12T16:15:00Z",
         verified: true,
+        viewed: false
       },
       {
         id: 5,
@@ -44,6 +48,7 @@ async function getData(): Promise<Patient[]> {
         email: "chen.wei@example.com",
         lastUpdated: "2024-02-11T08:45:00Z",
         verified: true,
+        viewed: false
       },
       {
         id: 6,
@@ -52,6 +57,7 @@ async function getData(): Promise<Patient[]> {
         email: "priya.p@example.com",
         lastUpdated: "2024-02-10T14:30:00Z",
         verified: true,
+        viewed: false
       },
       {
         id: 7,
@@ -60,6 +66,7 @@ async function getData(): Promise<Patient[]> {
         email: "alex.t@example.com",
         lastUpdated: "2024-02-09T10:20:00Z",
         verified: true,
+        viewed: false
       },
       {
         id: 8,
@@ -68,6 +75,7 @@ async function getData(): Promise<Patient[]> {
         email: "mgarcia@example.com",
         lastUpdated: "2024-02-08T13:15:00Z",
         verified: false,
+        viewed: false
       },
       {
         id: 9,
@@ -76,6 +84,7 @@ async function getData(): Promise<Patient[]> {
         email: "jwilson@example.com",
         lastUpdated: "2024-02-07T17:40:00Z",
         verified: false,
+        viewed: false
       },
       {
         id: 10,
@@ -84,6 +93,7 @@ async function getData(): Promise<Patient[]> {
         email: "lisa.a@example.com",
         lastUpdated: "2024-02-06T12:10:00Z",
         verified: false,
+        viewed: false
       },
       {
         id: 11,
@@ -92,6 +102,7 @@ async function getData(): Promise<Patient[]> {
         email: "dkim@example.com",
         lastUpdated: "2024-02-05T09:55:00Z",
         verified: false,
+        viewed: false
       }
     // ...
   ];
@@ -105,7 +116,7 @@ export default async function PhysicianPage() {
     <div>
       <div className="bg-off-white">
         <h1 className="text-4xl font-bold text-center py-10 font-[Syne]">
-          Welcome {physician?.fullName}
+          Welcome Dr. {physician?.fullName}
         </h1>
       </div>
       <div className="container mx-auto py-10">
