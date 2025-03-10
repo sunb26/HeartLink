@@ -11,7 +11,6 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -153,11 +152,11 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 	var newFile uploadedFile
 
 	// create uploads directory (if it doesn't exist) - TESTING ONLY (will not be saving locally in the end)
-	if err := os.MkdirAll("uploads", 0755); err != nil {
-		fmt.Printf("Error creating uploads directory: %v\n", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	// if err := os.MkdirAll("uploads", 0755); err != nil {
+	// 	fmt.Printf("Error creating uploads directory: %v\n", err)
+	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return
+	// }
 
 	// connect to firebase storage (do this before receive file)
 	errFB := firebasedb.FirebaseDB().Connect()

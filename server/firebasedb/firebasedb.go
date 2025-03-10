@@ -5,6 +5,7 @@ package firebasedb
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -21,6 +22,20 @@ import (
 
 type FireDB struct {
 	*db.Client
+}
+
+type configFile struct {
+	Type                        string
+	Project_id                  string
+	Private_key_id              string
+	Private_key                 string
+	Client_email                string
+	Client_id                   string
+	Auth_uri                    string
+	Token_uri                   string
+	Auth_provider_x509_cert_url string
+	Client_x509_cert_url        string
+	Universe_domain             string
 }
 
 var fireDB FireDB
@@ -143,7 +158,28 @@ func (db *FireDB) Connect() error {
 	}
 
 	ctx := context.Background()
-	opt := option.WithCredentialsFile(rootDir + os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+	// opt := option.WithCredentialsFile(rootDir + os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
+
+	configFile1 := configFile{
+		os.Getenv("Type"),
+		os.Getenv("Project_id"),
+		os.Getenv("Private_key_id"),
+		os.Getenv("Private_key"),
+		os.Getenv("Client_email"),
+		os.Getenv("Client_id"),
+		os.Getenv("Auth_uri"),
+		os.Getenv("Token_uri"),
+		os.Getenv("Auth_provider_x509_cert_url"),
+		os.Getenv("Client_x509_cert_url"),
+		os.Getenv("Universe_domain"),
+	}
+
+	configFile1JSON, err := json.Marshal(configFile1)
+	if err != nil {
+		fmt.Printf("Error creating JSON file: %v\n", err)
+	}
+
+	opt := option.WithCredentialsJSON(configFile1JSON)
 
 	client, err := storage.NewClient(ctx, opt)
 	if err != nil {
