@@ -10,12 +10,9 @@ import (
 	"io"
 	"log"
 	"os"
-	"path/filepath"
-	"runtime"
 
 	"cloud.google.com/go/storage"
 	"firebase.google.com/go/db"
-	"github.com/joho/godotenv"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 )
@@ -142,20 +139,16 @@ func (db *FireDB) Connect() error {
 
 	fmt.Printf("Connecting to Firebase Storage\n") // TESTING
 
-	// get current file path
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		log.Fatalf("Unable to get current file info")
-	}
-
-	// get root directory of current file (based on the current file strcuture)
-	rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile)))
-
-	// load environment variables from .env file
-	err := godotenv.Load(filepath.Join(rootDir, ".env"))
-	if err != nil {
-		log.Fatalf("Error loading .env file: %v", err)
-	}
+	/* COMMENT OUT WHEN COMMITTING */
+	// _, currentFile, _, ok := runtime.Caller(0) // get current file path
+	// if !ok {
+	// 	log.Fatalf("Unable to get current file info")
+	// }
+	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file (based on the current file strcuture)
+	// err := godotenv.Load(filepath.Join(rootDir, ".env")) // load environment variables from .env file
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file: %v", err)
+	// }
 
 	ctx := context.Background()
 	// opt := option.WithCredentialsFile(rootDir + os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
