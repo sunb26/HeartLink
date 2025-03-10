@@ -70,14 +70,14 @@ struct RecordingView: View {
                     if countdown > 0 {
                         countdown -= 1
                         if countdown == 0 {
-                            toggleRecording()
-
                             guard let char = bluetoothManager.patientInfoCharacteristic else {
                                 print("Could not find patientInfo characteristic")
                                 return
                             }
                             let patId = "\(patient.patientId)".data(using: .utf8)!
                             bluetoothManager.mcuPeripheral?.writeValue(patId, for: char, type: .withResponse)
+                            
+                            toggleRecording()
                         }
                     } else {
                         recordingDuration -= 1
