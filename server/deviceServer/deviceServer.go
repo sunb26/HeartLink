@@ -12,7 +12,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -134,8 +133,8 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n")    // NEED THIS (Arduino expects resposne when sends POST request)
-	fmt.Printf("ReceiveMultipartForm Endpoint - Start\n\n") // testing
+	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n")      // NEED THIS (Arduino expects resposne when sends POST request)
+	fmt.Printf("\nReceiveMultipartForm Endpoint - Start\n\n") // testing
 
 	err := r.ParseMultipartForm(32 << 15) // 1 MB max
 	if err != nil {
@@ -158,6 +157,19 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 		fmt.Printf("Error creating uploads directory: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	// connect to firebase storage (do this before receive file)
+	errFB := firebasedb.FirebaseDB().Connect()
+	if errFB != nil {
+		log.Println(errFB)
+		return
+	}
+
+	// TEST firebase connection via "get all" call
+	testErr := firebasedb.FirebaseDB().GetAllFilesFirebase()
+	if testErr != nil {
+		log.Println(testErr)
 	}
 
 	for _, fheaders := range r.MultipartForm.File {
@@ -216,7 +228,7 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 
 			// upload file to LOCAL storage (for testing purposes)
 			// headers.Filename = "testFileManual2.wav" // TESTING
-			filePath := filepath.Join("uploads", headers.Filename)
+			/*filePath := filepath.Join("uploads", headers.Filename)
 			err = os.WriteFile(filePath, []byte(newFile.FileContent), 0644)
 			if err != nil {
 				fmt.Printf("Error saving file: %v\n", err)
@@ -224,13 +236,24 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			fmt.Printf("Successfully saved file: %s\n", filePath) // TESTING
+			*/
+
+			// filePath := filepath.Join("test", headers.Filename)                                                  // filePath is the file path to the file in firebase storage (where want to save it)
+			filePath := "recordings/" + headers.Filename                                                         // TESTING                                                         // TESTING
+			publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase([]byte(newFile.FileContent), filePath) // upload wav file to firebase storage
+			if err != nil {
+				log.Fatalf("Error uploading WAV file to Firebase Storage: %v", err)
+			}
+			fmt.Printf("Successfully uploaded file to Firebase Storage at: %s\n", publicURL) // TESTING
+			fmt.Fprintf(w, `{"status": "success", "url": %q}`, publicURL)
+			// END ADDED
 
 		}
 
 	}
 
 	userIDWav := newFile.Filename
-	userID := strings.Split(strings.Split(userIDWav, "_")[1], ".")[0] // final userID value
+	userID := strings.Split(strings.Split(userIDWav, "_")[1], ".")[0] // final userID value (for uploading to relational database)
 	fmt.Printf("userID: %v\n", userID)                                // testing
 
 	fmt.Fprint(w, "server: about to send data\n") // TESTING
@@ -252,5 +275,5 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "server: data sent (2)\n") // TESTING
 
 	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n")    // TESTING (not needed)
-	fmt.Printf("ReceiveMultipartForm Endpoint - End\n\n") // TESTING (not needed)
+	fmt.Printf("\nReceiveMultipartForm Endpoint - End\n") // TESTING (not needed)
 }
