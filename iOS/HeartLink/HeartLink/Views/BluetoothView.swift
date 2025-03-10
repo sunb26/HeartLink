@@ -35,6 +35,7 @@ struct BluetoothView: View {
                             bluetoothManager.disconnect(peripheral: peripheral)
                         } else {
                             bluetoothManager.connect(to: peripheral)
+                            bluetoothManager.wifiConnStatus = "notConnected"
                             self.sendWifiCreds = true
                         }
                     }) {

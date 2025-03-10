@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.16.2 (2025-03-10)
+- fix bug in iOS app where wifi doesn't disconnect if bluetooth disconnects
+
 ## 1.16.1 (2025-03-06)
 - update patient table text colours and header titles
 
