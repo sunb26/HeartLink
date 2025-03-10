@@ -20,18 +20,18 @@ func main() {
 
 	// each individual HandleFunc is used to handle a specific endpoint
 	mux.HandleFunc("/POSTRawAudioFile", deviceServer.POSTRawAudioFile)
-	mux.HandleFunc("/endpoint1", endpoint2Pkg.GetEndpoint1)         // TESTING
-	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1) // TESTING
-	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2) // TESTING
+	mux.HandleFunc("/ReceiveMultipartForm", deviceServer.ReceiveMultipartForm) // TESTING
+	mux.HandleFunc("/endpoint1", endpoint2Pkg.GetEndpoint1)                    // TESTING
+	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1)            // TESTING
+	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2)            // TESTING
 
 	ctx := context.Background()
 
 	// define the http server
 	server := &http.Server{
-		Addr:    ":8080", // can use this as address to run locally or on hosted server
+		Addr: ":8080", // can use this as address to run locally or on hosted server
+		// Addr:    "192.168.:8080", // TESTING (for local network)
 		Handler: mux,
-
-		// Add in a ReadTimeout, WriteTimeout, and IdleTimeout
 	}
 
 	error := server.ListenAndServe() // starts http server, saves any resulting errors

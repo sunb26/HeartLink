@@ -3,16 +3,17 @@
 package firebasedb
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"firebase.google.com/go/db"
-
 	"cloud.google.com/go/storage"
+	"firebase.google.com/go/db"
 	"github.com/joho/godotenv"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -26,13 +27,59 @@ var fireDB FireDB
 var bucket *storage.BucketHandle
 
 // UploadWAVToFirebase function
-func (db *FireDB) UploadWAVToFirebase(localFilePath, firebaseStoragePath string) error {
+// func (db *FireDB) UploadWAVToFirebase(file multipart.File, storagePath string) (string, error) {
+func (db *FireDB) UploadWAVToFirebase(file string, storagePath string) (string, error) { // need to figure out the arguments for this function
 
-	client := db.Client
-	fmt.Print("Client: ", client, "\n") // TESTING
+	ctx := context.Background()
 
-	fmt.Printf("Successfully uploaded %s to Firebase Storage at path: %s\n", localFilePath, firebaseStoragePath)
-	return nil
+	object := bucket.Object(storagePath)
+
+	// set up writing object to write .wav files
+	writer := object.NewWriter(ctx)
+	writer.ContentType = "audio/wav"
+
+	// read wav file data (temporary)
+	f, err := os.Open(file)
+	if err != nil {
+		fmt.Printf("os.Open error: %v", err)
+		return "", err
+	}
+	defer f.Close()
+	data, err := io.ReadAll(f)
+	if err != nil {
+		fmt.Printf("io.ReadAll error: %v", err)
+		return "", err
+	}
+
+	// copy file data to storage
+	_, err = io.Copy(writer, bytes.NewReader(data))
+	if err != nil {
+		fmt.Printf("io.Copy error: %v", err)
+		return "", err
+	}
+
+	// close writer to finalize upload
+	err = writer.Close()
+	if err != nil {
+		fmt.Printf("Writer.Close error: %v", err)
+		return "", err
+	}
+
+	// set public access
+	err = object.ACL().Set(ctx, storage.AllUsers, storage.RoleReader)
+	if err != nil {
+		fmt.Printf("ACL.Set error: %v", err)
+		return "", err
+	}
+
+	// get public URL
+	attrs, err := object.Attrs(ctx)
+	if err != nil {
+		fmt.Printf("Attrs error: %v", err)
+		return "", err
+	}
+
+	return attrs.MediaLink, nil
 
 }
 
