@@ -28,7 +28,7 @@ var bucket *storage.BucketHandle
 
 // UploadWAVToFirebase function
 // func (db *FireDB) UploadWAVToFirebase(file multipart.File, storagePath string) (string, error) {
-func (db *FireDB) UploadWAVToFirebase(file string, storagePath string) (string, error) { // need to figure out the arguments for this function
+func (db *FireDB) UploadWAVToFirebase(fileContent []byte, storagePath string) (string, error) { // need to figure out the arguments for this function
 
 	ctx := context.Background()
 
@@ -37,9 +37,15 @@ func (db *FireDB) UploadWAVToFirebase(file string, storagePath string) (string, 
 	// set up writing object to write .wav files
 	writer := object.NewWriter(ctx)
 	writer.ContentType = "audio/wav"
+	// metadata: { firebaseStorageDownloadTokens: uuidv3() }
+	// writer.Metadata = map[string]string{
+	// 	metadata: {
+	// 		firebaseStorageDownloadTokens: uuidv3(),
+	// 	},
+	// }
 
 	// read wav file data (temporary)
-	f, err := os.Open(file)
+	/* f, err := os.Open(file)
 	if err != nil {
 		fmt.Printf("os.Open error: %v", err)
 		return "", err
@@ -49,10 +55,10 @@ func (db *FireDB) UploadWAVToFirebase(file string, storagePath string) (string, 
 	if err != nil {
 		fmt.Printf("io.ReadAll error: %v", err)
 		return "", err
-	}
+	}*/
 
 	// copy file data to storage
-	_, err = io.Copy(writer, bytes.NewReader(data))
+	_, err := io.Copy(writer, bytes.NewReader(fileContent))
 	if err != nil {
 		fmt.Printf("io.Copy error: %v", err)
 		return "", err
@@ -109,7 +115,8 @@ func (db *FireDB) GetAllFilesFirebase() error {
 		files = append(files, attrs.Name)
 	}
 
-	fmt.Printf(`{"files": %q}`, files)
+	fmt.Printf(`{"files": %q`, files)
+	fmt.Println()
 
 	return nil
 
@@ -142,6 +149,8 @@ func (db *FireDB) Connect() error {
 	if err != nil {
 		log.Fatalf("Failed to create client: %v", err)
 	}
+
+	// token, err := client.CustomToken(ctx, os.Getenv("FIREBASE_UID"))
 
 	bucket = client.Bucket(os.Getenv("FIREBASE_STORAGE_BUCKET"))
 
