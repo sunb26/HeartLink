@@ -128,8 +128,10 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 
 	// ensure receiving POST request
 	if r.Method != "POST" {
-		log.Fatalln(errors.New("invalid method"))
-		return
+		// log.Fatalln(errors.New("invalid method"))
+		// return
+		fmt.Println("invalid method error (should be POST request)")
+		fmt.Println("actual r.method:", r.Method)
 	}
 
 	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n")      // NEED THIS (Arduino expects resposne when sends POST request)
