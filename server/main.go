@@ -29,8 +29,8 @@ func main() {
 
 	// define the http server
 	server := &http.Server{
-		Addr: ":8080", // can use this as address to run locally or on hosted server
-		// Addr:    "192.168.:8080", // TESTING (for local network)
+		Addr: ":80", // can use this as address to run locally or on hosted server
+		// Addr:    "192.168.137.108:8080", // TESTING (for local network)
 		Handler: mux,
 	}
 
