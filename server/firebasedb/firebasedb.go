@@ -5,11 +5,11 @@ package firebasedb
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	"cloud.google.com/go/storage"
 	"firebase.google.com/go/db"
@@ -21,19 +21,19 @@ type FireDB struct {
 	*db.Client
 }
 
-type configFile struct {
-	Type                        string
-	Project_id                  string
-	Private_key_id              string
-	Private_key                 string
-	Client_email                string
-	Client_id                   string
-	Auth_uri                    string
-	Token_uri                   string
-	Auth_provider_x509_cert_url string
-	Client_x509_cert_url        string
-	Universe_domain             string
-}
+// type configFile struct {
+// 	Type                        string `json:"type"`
+// 	project_id                  string
+// 	private_key_id              string
+// 	private_key                 string
+// 	client_email                string
+// 	client_id                   string
+// 	auth_uri                    string
+// 	token_uri                   string
+// 	auth_provider_x509_cert_url string
+// 	client_x509_cert_url        string
+// 	universe_domain             string
+// }
 
 var fireDB FireDB
 var bucket *storage.BucketHandle
@@ -145,34 +145,92 @@ func (db *FireDB) Connect() error {
 	// 	log.Fatalf("Unable to get current file info")
 	// }
 	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file (based on the current file strcuture)
-	// err := godotenv.Load(filepath.Join(rootDir, ".env")) // load environment variables from .env file
+	// err := godotenv.Load(filepath.Join(rootDir, ".env"))             // load environment variables from .env file
 	// if err != nil {
 	// 	log.Fatalf("Error loading .env file: %v", err)
 	// }
+	/* END COMMENT OUT WHEN COMMITTING */
 
 	ctx := context.Background()
 	// opt := option.WithCredentialsFile(rootDir + os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 
-	configFile1 := configFile{
-		os.Getenv("Type"),
-		os.Getenv("Project_id"),
-		os.Getenv("Private_key_id"),
-		os.Getenv("Private_key"),
-		os.Getenv("Client_email"),
-		os.Getenv("Client_id"),
-		os.Getenv("Auth_uri"),
-		os.Getenv("Token_uri"),
-		os.Getenv("Auth_provider_x509_cert_url"),
-		os.Getenv("Client_x509_cert_url"),
-		os.Getenv("Universe_domain"),
-	}
+	// privateKeyRaw := os.Getenv("private_key")
+	// fmt.Println("Raw private key length:", len(privateKeyRaw))
+	// fmt.Println("Raw private key first 20 chars:", privateKeyRaw[:40])
 
-	configFile1JSON, err := json.Marshal(configFile1)
-	if err != nil {
-		fmt.Printf("Error creating JSON file: %v\n", err)
-	}
+	// configFile1 := configFile{
+	// 	os.Getenv("type"),
+	// 	os.Getenv("project_id"),
+	// 	os.Getenv("private_key_id"),
+	// 	strings.ReplaceAll(os.Getenv("private_key"), "\\n", "\n"),
+	// 	os.Getenv("client_email"),
+	// 	os.Getenv("client_id"),
+	// 	os.Getenv("auth_uri"),
+	// 	os.Getenv("token_uri"),
+	// 	os.Getenv("auth_provider_x509_cert_url"),
+	// 	os.Getenv("client_x509_cert_url"),
+	// 	os.Getenv("universe_domain"),
+	// }
 
-	opt := option.WithCredentialsJSON(configFile1JSON)
+	// configPrivateKey := configFile1.private_key
+	// fmt.Println("After: private key length:", len(configPrivateKey))
+	// fmt.Println("After: private key chars:", configPrivateKey)
+
+	// fmt.Printf("json file: %v\n", configFile1.Type)
+
+	// configFile1JSON, err := json.Marshal(configFile1)
+	// if err != nil {
+	// 	fmt.Printf("Error creating JSON file: %v\n", err)
+	// }
+
+	// fmt.Printf("json file: %v\n", configFile1JSON)
+
+	// opt := option.WithCredentialsJSON(configFile1JSON)
+
+	// tempFile, err := os.CreateTemp("", "google-credentials-*.json")
+	// if err != nil {
+	// 	log.Fatalf("Failed to create temp file: %v", err)
+	// }
+	// defer os.Remove(tempFile.Name())
+
+	// if _, err := tempFile.Write(configFile1JSON); err != nil {
+	// 	log.Fatalf("Failed to write to temp file: %v", err)
+	// }
+	// if err := tempFile.Close(); err != nil {
+	// 	log.Fatalf("Failed to close temp file: %v", err)
+	// }
+
+	// opt := option.WithCredentialsFile(tempFile.Name())
+
+	//try
+
+	credentialJSON := []byte(fmt.Sprintf(`{
+		"type": %q,
+		"project_id": %q,
+		"private_key_id": %q,
+		"private_key": %q,
+		"client_email": %q,
+		"client_id": %q,
+		"auth_uri": %q,
+		"token_uri": %q,
+		"auth_provider_x509_cert_url": %q,
+		"client_x509_cert_url": %q,
+		"universe_domain": %q
+	}`,
+		os.Getenv("type"),
+		os.Getenv("project_id"),
+		os.Getenv("private_key_id"),
+		strings.ReplaceAll(os.Getenv("private_key"), "\\n", "\n"),
+		os.Getenv("client_email"),
+		os.Getenv("client_id"),
+		os.Getenv("auth_uri"),
+		os.Getenv("token_uri"),
+		os.Getenv("auth_provider_x509_cert_url"),
+		os.Getenv("client_x509_cert_url"),
+		os.Getenv("universe_domain"),
+	))
+
+	opt := option.WithCredentialsJSON(credentialJSON)
 
 	client, err := storage.NewClient(ctx, opt)
 	if err != nil {
@@ -186,7 +244,8 @@ func (db *FireDB) Connect() error {
 	// check if bucket exists + created successfully
 	_, err = bucket.Attrs(ctx)
 	if err != nil {
-		log.Fatalf("Failed to get bucket attributes: %v", err)
+		fmt.Printf("Failed to get bucket attributes - error message: %v\n", err)
+		// log.Fatalf("Failed to get bucket attributes: %v", err)
 	}
 
 	fmt.Printf("Successfully connected to Firebase Storage\n") // TESTING

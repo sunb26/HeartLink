@@ -241,7 +241,8 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 			filePath := "recordings/" + headers.Filename                                                         // TESTING                                                         // TESTING
 			publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase([]byte(newFile.FileContent), filePath) // upload wav file to firebase storage
 			if err != nil {
-				log.Fatalf("Error uploading WAV file to Firebase Storage: %v", err)
+				fmt.Printf("Error uploading WAV file to Firebase Storage - error message: %v\n", err)
+				// log.Fatalf("Error uploading WAV file to Firebase Storage: %v", err)
 			}
 			fmt.Printf("Successfully uploaded file to Firebase Storage at: %s\n", publicURL) // TESTING
 			fmt.Fprintf(w, `{"status": "success", "url": %q}`, publicURL)
