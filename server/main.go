@@ -6,20 +6,39 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"heartlinkServer/deviceServer"
 	"heartlinkServer/endpoint2Pkg" // TESTING
+	"heartlinkServer/handlers"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 func main() {
+	log.Println("Begin main function")
 
-	log.Println("Server Running")
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatalf("failed to load environment variables: %v", err)
+	}
+
+	// connect to the SQL database
+	db, err := sqlx.Connect("postgres", os.Getenv("SQL_DSN"))
+	if err != nil {
+		log.Fatalf("failed to open to database: %v", err)
+	}
+
+	// Instantiate dependencies to be injected for the handlers
+	env := &handlers.Env{DB: db}
 
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
 	// each HandleFunc is used to handle a specific endpoint
-	mux.HandleFunc("/POSTRawAudioFile", deviceServer.POSTRawAudioFile)
+	mux.HandleFunc("/POSTRawAudioFile", handlers.POSTRawAudioFile)
+	mux.HandleFunc("/createPhysician", env.CreatePhysician)
 	mux.HandleFunc("/endpoint1", endpoint2Pkg.GetEndpoint1)         // TESTING
 	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1) // TESTING
 	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2) // TESTING
@@ -28,12 +47,13 @@ func main() {
 
 	// define http server
 	server := &http.Server{
-		Addr: ":8080", // address to run on localHost or on google cloud server
-		// Addr:    "192.168.:8080", // connect to local IP network
+		Addr:    ":8080", // address to run on localHost or on google cloud server
 		Handler: mux,
 	}
 
-	error := server.ListenAndServe() // starts http server
+	log.Println("Server listening on port 8080...")
+	error := server.ListenAndServe()
+
 	if errors.Is(error, http.ErrServerClosed) {
 		fmt.Printf("server closed\n")
 	} else if error != nil {
