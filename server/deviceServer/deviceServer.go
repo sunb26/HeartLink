@@ -5,7 +5,6 @@ package deviceServer
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"heartlinkServer/firebasedb"
 	"io"
@@ -14,12 +13,13 @@ import (
 	"strings"
 )
 
-type requestBody struct { // CAN ADD "STRUCT TAGS" TO THIS IF WILL HELP WITH DECODING STRUCT
-	UserID       string
-	WavFileBytes uint64 // byte array -> a slice of uint8 values
-}
+// type requestBody struct { // CAN ADD "STRUCT TAGS" TO THIS IF WILL HELP WITH DECODING STRUCT
+// 	UserID       string
+// 	WavFileBytes uint64 // byte array -> a slice of uint8 values
+// }
 
-// POSTRawAudioFile function
+// POSTRawAudioFile function (OLD)
+/*
 func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n\n")
@@ -60,13 +60,12 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	/* No parameters in POST endpoint to read */
+	// No parameters in POST endpoint to read
 
 	// --- extracting request body fields --- //
 
 	userID := req.UserID             // extract userID from request body
 	WavFileBytes := req.WavFileBytes // extract wavFileBytes from request body
-	/* json.Unmarshal([]byte(req.WavFileBytes), &req.WavFileBytes) */
 	//json.Unmarshal([]uint64(req.WavFileBytes), &req.WavFileBytes)
 
 	fmt.Fprint(w, "POSTRawAudioFile request body:\n") // Write request body to response writer "w"
@@ -74,20 +73,13 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("userID: %v\n", userID) // Write userID to response writer "w"
 	fmt.Printf("wavFileBytes: %v\n", WavFileBytes)
 
-	/* fmt.Fprint(w, "wavFileBytes: ", req.WavFileBytes, "\n") // Write wavFileBytes to response writer "w" */
 	// fmt.Fprint(w, "wavFileBytes: ", req.WavFileBytes[0], "\n")   // Write wavFileBytes to response writer "w"
 	//fmt.Fprint(w, "wavFileBytes: ", req.WavFileBytes[1], "\n\n") // second byte in wavFileBytes
 	// fmt.Fprint(w, "wavFileBytes: ", string(wavFileBytes), "\n\n") // Write wavFileBytes to response writer "w"
 
 	// --- POST request (from ESP32 to server) requirements --- //
 
-	/*
-		1. no arguments in URL to extract
-		2. request body in JSON format with the following fields:
-			a. userID (string) - ESP32 should get this from app (via BT)
-			b. wavFileBytes (byte array) - however .wav file is broken down into bytes, send here
-		3. ESP32 will receive response from server (e.g. success code) to know worked
-	*/
+
 
 	// --- establishing firebase connection --- //
 
@@ -98,52 +90,36 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// TEST firebase connection via "get all" call
-	testErr := firebasedb.FirebaseDB().GetAllFilesFirebase()
-	if testErr != nil {
-		log.Println(testErr)
-	}
+	// testErr := firebasedb.FirebaseDB().GetAllFilesFirebase()
+	// if testErr != nil {
+	// 	log.Println(testErr)
+	// }
 
 	// r.ParseMultipartForm(10 << 20) // Limit upload size to 10MB
 
-	/*
-		testWavFilepath := "testWavFile1.wav"                                                       // path to test wav file (with respect to current file)
-		publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase()(testWavFilepath, SOMETHING) // upload wav file to firebase storage
-		if err != nil {
-			log.Fatalf("Error uploading WAV file to Firebase Storage: %v", err)
-		}
-		fmt.Fprintf(w, `{"status": "success", "url": %q}`, publicURL)
-	*/
+
 
 	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n")
 }
+*/
 
-//
-//
-//
-//
-//
-//
+func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 
-func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("\nReceiveMultipartForm Endpoint - Start\n\n") // TESTING
 
 	// ensure receiving POST request
 	if r.Method != "POST" {
-		// log.Fatalln(errors.New("invalid method"))
-		// return
-		fmt.Println("invalid method error (should be POST request)")
-		fmt.Println("actual r.method:", r.Method)
+		log.Println("invalid http request type - should be POST request - instead is", r.Method)
 	}
 
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n")      // NEED THIS (Arduino expects resposne when sends POST request)
-	fmt.Printf("\nReceiveMultipartForm Endpoint - Start\n\n") // testing
+	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n") // Arduino expects response when sends POST request
 
-	err := r.ParseMultipartForm(32 << 15) // 1 MB max
+	err := r.ParseMultipartForm(32 << 15) // set 1 MB max on input file size
 	if err != nil {
-		fmt.Printf("Error parsing multipart form: %v\n", err)
-		log.Fatal(err) // log better error message
+		log.Printf("Error parsing multipart form: %v\n", err)
 	}
 
-	// define struct to send back response to the client
+	// define struct to send response to client
 	type uploadedFile struct {
 		Size        int64  `json:"size"`
 		ContentType string `json:"content_type"`
@@ -153,24 +129,11 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 
 	var newFile uploadedFile
 
-	// create uploads directory (if it doesn't exist) - TESTING ONLY (will not be saving locally in the end)
-	// if err := os.MkdirAll("uploads", 0755); err != nil {
-	// 	fmt.Printf("Error creating uploads directory: %v\n", err)
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-
 	// connect to firebase storage (do this before receive file)
 	errFB := firebasedb.FirebaseDB().Connect()
 	if errFB != nil {
-		log.Println(errFB)
+		log.Printf("Error connecting to Firebase storage %v\n", errFB)
 		return
-	}
-
-	// TEST firebase connection via "get all" call
-	testErr := firebasedb.FirebaseDB().GetAllFilesFirebase()
-	if testErr != nil {
-		log.Println(testErr)
 	}
 
 	for _, fheaders := range r.MultipartForm.File {
@@ -178,16 +141,12 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 		for _, headers := range fheaders {
 
 			file, err := headers.Open()
-
 			if err != nil {
-				// http.Error(w, err.Error(), http.StatusInternalServerError)
-				fmt.Printf("Error opening file: %v", err)
+				log.Printf("Error opening file: %v\n", err)
 				return
 			}
 
 			defer file.Close()
-
-			// detect contentType
 
 			buff := make([]byte, 512)
 
@@ -195,87 +154,61 @@ func ReceiveMultipartForm(w http.ResponseWriter, r *http.Request) {
 
 			file.Seek(0, 0)
 
-			contentType := http.DetectContentType(buff)
-
-			newFile.ContentType = contentType
-
-			// get file size
+			newFile.ContentType = http.DetectContentType(buff)
 
 			var sizeBuff bytes.Buffer
 			fileSize, err := sizeBuff.ReadFrom(file)
 			if err != nil {
-				// http.Error(w, err.Error(), http.StatusInternalServerError)
-				fmt.Printf("Error reading file: %v", err)
+				log.Printf("Error reading file: %v\n", err)
 				return
 			}
 
-			fmt.Fprint(w, "server: file size: ", fileSize, "\n") // proves endpoint receiving entire file
+			fmt.Fprint(w, "server: file size: ", fileSize, "\n") // TESTING - proves endpoint receiving entire file
 
-			file.Seek(0, 0) // reset read/write back to position 0
+			file.Seek(0, 0)
 
-			newFile.Size = fileSize // write how large file is to newFile
+			newFile.Size = fileSize
 
 			newFile.Filename = headers.Filename
 
 			contentBuf := bytes.NewBuffer(nil)
 
 			if _, err := io.Copy(contentBuf, file); err != nil {
-				// http.Error(w, err.Error(), http.StatusInternalServerError)
-				fmt.Printf("Error copying file: %v", err)
+				log.Printf("Error copying file: %v\n", err)
 				return
 			}
 
 			newFile.FileContent = contentBuf.String()
 
-			// upload file to LOCAL storage (for testing purposes)
-			// headers.Filename = "testFileManual2.wav" // TESTING
-			/*filePath := filepath.Join("uploads", headers.Filename)
-			err = os.WriteFile(filePath, []byte(newFile.FileContent), 0644)
-			if err != nil {
-				fmt.Printf("Error saving file: %v\n", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			fmt.Printf("Successfully saved file: %s\n", filePath) // TESTING
-			*/
-
-			// filePath := filepath.Join("test", headers.Filename)                                                  // filePath is the file path to the file in firebase storage (where want to save it)
-			filePath := "recordings/" + headers.Filename                                                         // TESTING                                                         // TESTING
+			filePath := "recordings/" + newFile.Filename
 			publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase([]byte(newFile.FileContent), filePath) // upload wav file to firebase storage
 			if err != nil {
-				fmt.Printf("Error uploading WAV file to Firebase Storage - error message: %v\n", err)
-				// log.Fatalf("Error uploading WAV file to Firebase Storage: %v", err)
+				log.Printf("Error uploading WAV file to Firebase Storage: %v\n", err)
 			}
+
 			fmt.Printf("Successfully uploaded file to Firebase Storage at: %s\n", publicURL) // TESTING
-			fmt.Fprintf(w, `{"status": "success", "url": %q}`, publicURL)
-			// END ADDED
+			fmt.Println()
 
 		}
 
 	}
 
 	userIDWav := newFile.Filename
-	userID := strings.Split(strings.Split(userIDWav, "_")[1], ".")[0] // final userID value (for uploading to relational database)
-	fmt.Printf("userID: %v\n", userID)                                // testing
+	userID := strings.Split(strings.Split(userIDWav, "_")[1], ".")[0] // extract userID from filename
+	fmt.Printf("userID: %v\n", userID)                                // TESTING - will need to upload userID to relational database
 
-	fmt.Fprint(w, "server: about to send data\n") // TESTING
-
+	// populate data to send back to client
 	data := make(map[string]interface{})
-
-	// define the data to send back to the client
 	data["form_field_value"] = newFile.Filename
 	data["status"] = 200
-	// data["file_stats"] = newFile // UNCOMMENT THIS (if want to send client all file stats)
+	// data["file_stats"] = newFile // uncomment this if want to send client all file stats
 
 	// send data back to the client
 	if err = json.NewEncoder(w).Encode(data); err != nil {
-		fmt.Printf("Error encoding JSON: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("Error encoding JSON: %v\n", err)
 		return
 	}
 
-	fmt.Fprint(w, "server: data sent (2)\n") // TESTING
-
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n")    // TESTING (not needed)
-	fmt.Printf("\nReceiveMultipartForm Endpoint - End\n") // TESTING (not needed)
+	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n")    // TESTING
+	fmt.Printf("\nReceiveMultipartForm Endpoint - End\n") // TESTING
 }

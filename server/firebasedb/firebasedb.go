@@ -13,7 +13,7 @@ import (
 
 	"cloud.google.com/go/storage"
 	"firebase.google.com/go/db"
-	"google.golang.org/api/iterator"
+	"github.com/google/uuid"
 	"google.golang.org/api/option"
 )
 
@@ -21,79 +21,52 @@ type FireDB struct {
 	*db.Client
 }
 
-// type configFile struct {
-// 	Type                        string `json:"type"`
-// 	project_id                  string
-// 	private_key_id              string
-// 	private_key                 string
-// 	client_email                string
-// 	client_id                   string
-// 	auth_uri                    string
-// 	token_uri                   string
-// 	auth_provider_x509_cert_url string
-// 	client_x509_cert_url        string
-// 	universe_domain             string
-// }
-
 var fireDB FireDB
 var bucket *storage.BucketHandle
 
 // UploadWAVToFirebase function
-// func (db *FireDB) UploadWAVToFirebase(file multipart.File, storagePath string) (string, error) {
-func (db *FireDB) UploadWAVToFirebase(fileContent []byte, storagePath string) (string, error) { // need to figure out the arguments for this function
+func (db *FireDB) UploadWAVToFirebase(fileContent []byte, storagePath string) (string, error) {
 
 	ctx := context.Background()
+	key := uuid.New() // generate key to act as access token in firebase storage
+
+	fmt.Println("key value (in firebasedb.go):", key.String()) // TESTING
 
 	object := bucket.Object(storagePath)
 
-	// set up writing object to write .wav files
+	// set up object to write .wav files
 	writer := object.NewWriter(ctx)
 	writer.ContentType = "audio/wav"
-	// metadata: { firebaseStorageDownloadTokens: uuidv3() }
-	// writer.Metadata = map[string]string{
-	// 	metadata: {
-	// 		firebaseStorageDownloadTokens: uuidv3(),
-	// 	},
-	// }
-
-	// read wav file data (temporary)
-	/* f, err := os.Open(file)
-	if err != nil {
-		fmt.Printf("os.Open error: %v", err)
-		return "", err
+	writer.ChunkSize = 0
+	writer.ObjectAttrs.Metadata = map[string]string{
+		"firebaseStorageDownloadTokens": key.String(), // create access token from uniquely generated key
 	}
-	defer f.Close()
-	data, err := io.ReadAll(f)
-	if err != nil {
-		fmt.Printf("io.ReadAll error: %v", err)
-		return "", err
-	}*/
 
 	// copy file data to storage
 	_, err := io.Copy(writer, bytes.NewReader(fileContent))
 	if err != nil {
-		fmt.Printf("io.Copy error: %v", err)
+		log.Printf("io.Copy error: %v\n", err)
 		return "", err
 	}
 
 	// close writer to finalize upload
 	err = writer.Close()
 	if err != nil {
-		fmt.Printf("Writer.Close error: %v", err)
+		log.Printf("object.Close error: %v\n", err)
 		return "", err
 	}
 
 	// set public access
 	err = object.ACL().Set(ctx, storage.AllUsers, storage.RoleReader)
 	if err != nil {
-		fmt.Printf("ACL.Set error: %v", err)
+		log.Printf("ACL.Set error: %v\n", err)
 		return "", err
 	}
 
-	// get public URL
+	// get object attributes to return public URL
 	attrs, err := object.Attrs(ctx)
 	if err != nil {
-		fmt.Printf("Attrs error: %v", err)
+		log.Printf("Attrs error: %v\n", err)
 		return "", err
 	}
 
@@ -102,6 +75,7 @@ func (db *FireDB) UploadWAVToFirebase(fileContent []byte, storagePath string) (s
 }
 
 // TEST function (will use in other endpoints)
+/*
 func (db *FireDB) GetAllFilesFirebase() error {
 
 	directory := "recordings/" // hard coded (based on Firebase Storage structure)
@@ -133,77 +107,28 @@ func (db *FireDB) GetAllFilesFirebase() error {
 	return nil
 
 }
+*/
 
 // connect to firebase database
 func (db *FireDB) Connect() error {
 
 	fmt.Printf("Connecting to Firebase Storage\n") // TESTING
 
-	/* COMMENT OUT WHEN COMMITTING */
+	ctx := context.Background()
+
+	/* COMMENT OUT WHEN COMMITTING - FOR RUNNING WITH LOCAL HOST ONLY */
 	// _, currentFile, _, ok := runtime.Caller(0) // get current file path
 	// if !ok {
 	// 	log.Fatalf("Unable to get current file info")
 	// }
-	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file (based on the current file strcuture)
+	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file (based on the current file structure)
 	// err := godotenv.Load(filepath.Join(rootDir, ".env"))             // load environment variables from .env file
 	// if err != nil {
 	// 	log.Fatalf("Error loading .env file: %v", err)
 	// }
-	/* END COMMENT OUT WHEN COMMITTING */
+	/* END COMMENT OUT WHEN COMMITTING - FOR RUNNING WITH LOCAL HOST ONLY */
 
-	ctx := context.Background()
-	// opt := option.WithCredentialsFile(rootDir + os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-
-	// privateKeyRaw := os.Getenv("private_key")
-	// fmt.Println("Raw private key length:", len(privateKeyRaw))
-	// fmt.Println("Raw private key first 20 chars:", privateKeyRaw[:40])
-
-	// configFile1 := configFile{
-	// 	os.Getenv("type"),
-	// 	os.Getenv("project_id"),
-	// 	os.Getenv("private_key_id"),
-	// 	strings.ReplaceAll(os.Getenv("private_key"), "\\n", "\n"),
-	// 	os.Getenv("client_email"),
-	// 	os.Getenv("client_id"),
-	// 	os.Getenv("auth_uri"),
-	// 	os.Getenv("token_uri"),
-	// 	os.Getenv("auth_provider_x509_cert_url"),
-	// 	os.Getenv("client_x509_cert_url"),
-	// 	os.Getenv("universe_domain"),
-	// }
-
-	// configPrivateKey := configFile1.private_key
-	// fmt.Println("After: private key length:", len(configPrivateKey))
-	// fmt.Println("After: private key chars:", configPrivateKey)
-
-	// fmt.Printf("json file: %v\n", configFile1.Type)
-
-	// configFile1JSON, err := json.Marshal(configFile1)
-	// if err != nil {
-	// 	fmt.Printf("Error creating JSON file: %v\n", err)
-	// }
-
-	// fmt.Printf("json file: %v\n", configFile1JSON)
-
-	// opt := option.WithCredentialsJSON(configFile1JSON)
-
-	// tempFile, err := os.CreateTemp("", "google-credentials-*.json")
-	// if err != nil {
-	// 	log.Fatalf("Failed to create temp file: %v", err)
-	// }
-	// defer os.Remove(tempFile.Name())
-
-	// if _, err := tempFile.Write(configFile1JSON); err != nil {
-	// 	log.Fatalf("Failed to write to temp file: %v", err)
-	// }
-	// if err := tempFile.Close(); err != nil {
-	// 	log.Fatalf("Failed to close temp file: %v", err)
-	// }
-
-	// opt := option.WithCredentialsFile(tempFile.Name())
-
-	//try
-
+	// define credentials JSON file to store all environment variables
 	credentialJSON := []byte(fmt.Sprintf(`{
 		"type": %q,
 		"project_id": %q,
@@ -234,18 +159,15 @@ func (db *FireDB) Connect() error {
 
 	client, err := storage.NewClient(ctx, opt)
 	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
+		log.Fatalf("Failed to create client: %v\n", err)
 	}
-
-	// token, err := client.CustomToken(ctx, os.Getenv("FIREBASE_UID"))
 
 	bucket = client.Bucket(os.Getenv("FIREBASE_STORAGE_BUCKET"))
 
-	// check if bucket exists + created successfully
+	// check bucket created successfully
 	_, err = bucket.Attrs(ctx)
 	if err != nil {
-		fmt.Printf("Failed to get bucket attributes - error message: %v\n", err)
-		// log.Fatalf("Failed to get bucket attributes: %v", err)
+		log.Fatalf("Failed to get bucket attributes - error message: %v\n", err)
 	}
 
 	fmt.Printf("Successfully connected to Firebase Storage\n") // TESTING
