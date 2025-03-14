@@ -6,7 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"heartlinkServer/endpoint2Pkg" // TESTING
 	"heartlinkServer/handlers"
 	"log"
 	"net/http"
@@ -39,9 +38,6 @@ func main() {
 	// each HandleFunc is used to handle a specific endpoint
 	mux.HandleFunc("/POSTRawAudioFile", handlers.POSTRawAudioFile)
 	mux.HandleFunc("/createPhysician", env.CreatePhysician)
-	mux.HandleFunc("/endpoint1", endpoint2Pkg.GetEndpoint1)         // TESTING
-	mux.HandleFunc("/endpoint2_1", endpoint2Pkg.Endpoint2Function1) // TESTING
-	mux.HandleFunc("/endpoint2_2", endpoint2Pkg.Endpoint2Function2) // TESTING
 
 	ctx := context.Background()
 
