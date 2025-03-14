@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.17.0 (2025-03-13)
+- add server endpoint to upload .wav file with access token to Firebase 
+
 ## 1.16.2 (2025-03-10)
 - fix bug in iOS app where wifi doesn't disconnect if bluetooth disconnects
 
