@@ -4,7 +4,12 @@ module heartlinkServer
 
 go 1.23.5
 
-require firebase.google.com/go v3.13.0+incompatible
+require (
+	firebase.google.com/go v3.13.0+incompatible
+	github.com/lib/pq v1.10.9
+)
+
+require github.com/jmoiron/sqlx v1.4.0
 
 require (
 	cel.dev/expr v0.16.1 // indirect
