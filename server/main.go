@@ -12,18 +12,10 @@ import (
 	"os"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 func main() {
-	log.Println("Begin main function")
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatalf("failed to load environment variables: %v", err)
-	}
-
 	// connect to the SQL database
 	db, err := sqlx.Connect("postgres", os.Getenv("SQL_DSN"))
 	if err != nil {
