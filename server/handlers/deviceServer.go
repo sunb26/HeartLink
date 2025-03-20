@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 // type requestBody struct { // CAN ADD "STRUCT TAGS" TO THIS IF WILL HELP WITH DECODING STRUCT
@@ -167,7 +169,9 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 
 			newFile.Size = fileSize
 
-			newFile.Filename = headers.Filename
+			key := uuid.New() // generate key to act as access token in firebase storage
+
+			newFile.Filename = key.String() + "_" + headers.Filename
 
 			contentBuf := bytes.NewBuffer(nil)
 
@@ -192,7 +196,7 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	userIDWav := newFile.Filename
-	userID := strings.Split(strings.Split(userIDWav, "_")[1], ".")[0] // extract userID from filename
+	userID := strings.Split(strings.Split(userIDWav, "_")[2], ".")[0] // extract userID from filename
 	fmt.Printf("userID: %v\n", userID)                                // TESTING - will need to upload userID to relational database
 
 	// populate data to send back to client
