@@ -8,13 +8,13 @@ import (
 )
 
 type patient struct {
-	PatientId   int `db:"patient_id"`
-	FirstName   string
-	LastName    string
-	Email       string
-	LastUpdated string `db:"last_updated"`
-	Verified    bool
-	Viewed      bool
+	PatientId   int    `db:"patient_id" json:"patientId"`
+	FirstName   string `json:"firstName"`
+	LastName    string `json:"lastName"`
+	Email       string `json:"email"`
+	LastUpdated string `db:"last_updated" json:"lastUpdated"`
+	Verified    bool   `json:"verified"`
+	Viewed      bool   `json:"viewed"`
 }
 
 func (env *Env) ListPatients(w http.ResponseWriter, r *http.Request) {
