@@ -83,5 +83,5 @@ func (env *Env) ListPatients(w http.ResponseWriter, r *http.Request) {
 		log.Printf("listPatients: Error encoding JSON: %v\n", err)
 		return
 	}
-
+	log.Printf("listPatients Response: %v\n", patients)
 }
