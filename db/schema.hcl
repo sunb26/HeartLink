@@ -63,6 +63,11 @@ table "patient" {
     type    = date
     comment = "Date of Birth"
   }
+  column "last_updated" {
+    null = false
+    type = timestamptz
+    comment = "Last time the patient information was updated (NOT including new recordings)."
+  }
   primary_key {
     columns = [column.patient_id]
   }

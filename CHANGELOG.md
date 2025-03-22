@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.17.1 (2025-03-22)
+- update database schema patient table with last_updated column
+
 ## 1.17.0 (2025-03-13)
 - add server endpoint to upload .wav file with access token to Firebase 
 
