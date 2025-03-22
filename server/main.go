@@ -3,17 +3,23 @@
 package main
 
 import (
-	"context"
-	"errors"
-	"fmt"
 	"heartlinkServer/handlers"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
+
+func logging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		log.Printf("%s %s %s\n", r.Method, r.URL.Path, time.Since(start))
+	})
+}
 
 func main() {
 	// connect to the SQL database
@@ -31,25 +37,6 @@ func main() {
 	mux.HandleFunc("/POSTRawAudioFile", handlers.POSTRawAudioFile)
 	mux.HandleFunc("/createPhysician", env.CreatePhysician)
 
-	ctx := context.Background()
-
-	// define http server
-	server := &http.Server{
-		Addr:    ":8080", // address to run on localHost or on google cloud server
-		Handler: mux,
-	}
-
 	log.Println("Server listening on port 8080...")
-	error := server.ListenAndServe()
-
-	if errors.Is(error, http.ErrServerClosed) {
-		fmt.Printf("server closed\n")
-	} else if error != nil {
-		fmt.Printf("error listening for server: %s\n", error)
-	}
-
-	<-ctx.Done() // waiting indefinitely for context to be cancelled (should never happen)
-
-	log.Println("Server Ended") // this should never be printed
-
+	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
 }

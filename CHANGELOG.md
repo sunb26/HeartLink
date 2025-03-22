@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.18.0 (2025-03-22)
+- add handler logging 
+
 ## 1.17.1 (2025-03-22)
 - update database schema patient table with last_updated column
 
