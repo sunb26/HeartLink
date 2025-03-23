@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export type Patient = {
-  id: number;
+  patientId: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -153,7 +153,7 @@ export const columns: ColumnDef<Patient>[] = [
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               // TODO: do a fetch to a UPDATE endpoint
-              onClick={() => navigator.clipboard.writeText(`${patient.id}`)}
+              onClick={() => navigator.clipboard.writeText(`${patient.patientId}`)}
               className="font-bold"
             >
               EDIT
@@ -161,7 +161,7 @@ export const columns: ColumnDef<Patient>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               // TODO: do a fetch to a DELETE endpoint
-              onClick={() => navigator.clipboard.writeText(`${patient.id}`)}
+              onClick={() => navigator.clipboard.writeText(`${patient.patientId}`)}
               className="text-red-500 font-bold"
             >
               DELETE

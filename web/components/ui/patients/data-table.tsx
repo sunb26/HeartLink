@@ -41,7 +41,7 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
 }
 
-export function DataTable<TData extends { id: number }, TValue>({
+export function DataTable<TData extends { patientId: number }, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -124,7 +124,7 @@ export function DataTable<TData extends { id: number }, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
-                  onClick={() => router.push(`/patient/${row.original.id}`)}
+                  onClick={() => router.push(`/patient/${row.original.patientId}`)}
                   className="cursor-pointer hover:bg-gray-100 transition"
                 >
                   {row.getVisibleCells().map((cell, cellIndex, allCells) => (
