@@ -2,21 +2,39 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
+// Define structs needed to parse through layers of Clerk Request Body
+type ClerkReq struct {
+	Physician Physician `json:"data"`
+}
+
 type Physician struct {
-	Id    string
-	Email string
+	ID             string         `json:"id"`
+	EmailAddresses []EmailAddress `json:"email_addresses"`
+}
+
+type EmailAddress struct {
+	EmailAddress string `json:"email_address"`
 }
 
 func (env *Env) CreatePhysician(w http.ResponseWriter, r *http.Request) {
-	var p Physician
+	var d ClerkReq
 
-	// Decode request body
-	err := json.NewDecoder(r.Body).Decode(&p)
+	err := json.NewDecoder(r.Body).Decode(&d)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	id := d.Physician.ID
+	email := d.Physician.EmailAddresses[0].EmailAddress
+
+	if id == "" || email == "" {
+		http.Error(w, "missing required fields", http.StatusBadRequest)
+		log.Printf("createPhysician: %s %s\n", id, email)
 		return
 	}
 
@@ -27,7 +45,7 @@ func (env *Env) CreatePhysician(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = tx.Exec("INSERT INTO physician (physician_id, email) VALUES ($1, $2)", p.Id, p.Email)
+	_, err = tx.Exec("INSERT INTO physician (physician_id, email) VALUES ($1, $2) ON CONFLICT (physician_id) DO UPDATE SET email = $2", id, email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -40,4 +58,5 @@ func (env *Env) CreatePhysician(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	log.Printf("createPhysician Response: %s %s\n", id, email)
 }
