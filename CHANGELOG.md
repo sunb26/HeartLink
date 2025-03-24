@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.18.1 (2025-03-24)
+- update endpoint to pass raw audio file into python DSP algorithm and save filtered file to Firebase 
+
 ## 1.18.0 (2025-03-22)
 - add handler logging 
 - add listPatients endpoint
