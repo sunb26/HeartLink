@@ -121,7 +121,7 @@ func (db *FireDB) Connect() error {
 	// if !ok {
 	// 	log.Fatalf("Unable to get current file info")
 	// }
-	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file (based on the current file structure)
+	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file
 	// err := godotenv.Load(filepath.Join(rootDir, ".env"))             // load environment variables from .env file
 	// if err != nil {
 	// 	log.Fatalf("Error loading .env file: %v", err)
