@@ -103,7 +103,8 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 }
 */
 
-func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
+// MIGHT RENAME THIS, BC DOES MORE THAN THIS - UploadFilterRecording
+func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("\nReceiveMultipartForm Endpoint - Start\n\n") // TESTING
 
@@ -112,7 +113,7 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 		log.Println("invalid http request type - should be POST request - instead is", r.Method)
 	}
 
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - Start\n") // Arduino expects response when sends POST request
+	fmt.Fprint(w, "UploadFilterRecording Endpoint - Start\n") // Arduino expects response when sends POST request
 
 	err := r.ParseMultipartForm(32 << 15) // set 1 MB max on input file size
 	if err != nil {
@@ -211,6 +212,6 @@ func POSTRawAudioFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Fprint(w, "POSTRawAudioFile Endpoint - End\n")    // TESTING
-	fmt.Printf("\nReceiveMultipartForm Endpoint - End\n") // TESTING
+	fmt.Fprint(w, "UploadFilterRecording Endpoint - End\n") // TESTING
+	fmt.Printf("\nReceiveMultipartForm Endpoint - End\n")   // TESTING
 }
