@@ -3,7 +3,6 @@
 package firebasedb
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -25,7 +24,7 @@ var fireDB FireDB
 var bucket *storage.BucketHandle
 
 // UploadWAVToFirebase function
-func (db *FireDB) UploadWAVToFirebase(fileContent []byte, storagePath string) (string, error) {
+func (db *FireDB) UploadWAVToFirebase(fileContent io.ReadCloser, storagePath string) (string, error) {
 
 	ctx := context.Background()
 	key := uuid.New() // generate key to act as access token in firebase storage
@@ -43,7 +42,7 @@ func (db *FireDB) UploadWAVToFirebase(fileContent []byte, storagePath string) (s
 	}
 
 	// copy file data to storage
-	_, err := io.Copy(writer, bytes.NewReader(fileContent))
+	_, err := io.Copy(writer, fileContent)
 	if err != nil {
 		log.Printf("io.Copy error: %v\n", err)
 		return "", err

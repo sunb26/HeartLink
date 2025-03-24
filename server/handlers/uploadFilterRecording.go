@@ -7,7 +7,9 @@ import (
 	"heartlinkServer/firebasedb"
 	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/google/uuid"
@@ -128,6 +130,18 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 		FileContent string `json:"file_content"`
 	}
 
+	/* COMMENT OUT WHEN COMMITTING - FOR RUNNING WITH LOCAL HOST ONLY */
+	// _, currentFile, _, ok := runtime.Caller(0) // get current file path
+	// if !ok {
+	// 	log.Fatalf("Unable to get current file info")
+	// }
+	// rootDir := filepath.Dir(filepath.Dir(filepath.Dir(currentFile))) // get root directory of current file
+	// err = godotenv.Load(filepath.Join(rootDir, ".env"))              // load environment variables from .env file
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file: %v", err)
+	// }
+	/* END COMMENT OUT WHEN COMMITTING - FOR RUNNING WITH LOCAL HOST ONLY */
+
 	var newFile uploadedFile
 
 	// connect to firebase storage (do this before receive file)
@@ -183,8 +197,40 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 			newFile.FileContent = contentBuf.String()
 
+			// generate a POST request to send the unfiltered audio file to the python server for DSP
+			var requestBody bytes.Buffer
+
+			multipartWriter := multipart.NewWriter(&requestBody)
+
+			fileWriter, err := multipartWriter.CreateFormFile("audio", newFile.Filename)
+			if err != nil {
+				log.Printf("Error creating form file: %v\n", err)
+			}
+
+			fileContentReader := strings.NewReader(newFile.FileContent)
+			_, err = io.Copy(fileWriter, fileContentReader)
+			if err != nil {
+				log.Printf("Error copying file: %v\n", err)
+			}
+
+			multipartWriter.Close()
+
+			req, err := http.NewRequest("POST", os.Getenv("PYTHON_SERVER_URL"), &requestBody)
+			if err != nil {
+				log.Printf("Error creating POST request: %v\n", err)
+			}
+			req.Header.Set("Content-Type", multipartWriter.FormDataContentType())
+
+			client := &http.Client{}
+			resp, err := client.Do(req)
+			if err != nil {
+				log.Printf("Erorr sending POST request to python server: %v\n", err)
+			}
+			defer resp.Body.Close()
+
+			// upload the filtered audio recording to Firebase
 			filePath := "recordings/" + newFile.Filename
-			publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase([]byte(newFile.FileContent), filePath) // upload wav file to firebase storage
+			publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase(resp.Body, filePath)
 			if err != nil {
 				log.Printf("Error uploading WAV file to Firebase Storage: %v\n", err)
 			}
@@ -204,7 +250,6 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 	data := make(map[string]interface{})
 	data["form_field_value"] = newFile.Filename
 	data["status"] = 200
-	// data["file_stats"] = newFile // uncomment this if want to send client all file stats
 
 	// send data back to the client
 	if err = json.NewEncoder(w).Encode(data); err != nil {
