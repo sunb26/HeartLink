@@ -11,10 +11,11 @@ struct RecordingView: View {
     @State var startRecording: Bool = false
     @State var isRecording: Bool = false
     @State var countdown: Int8 = 0
-    @State var recordingDuration: Int8 = 15
+    @State var recordingDuration: Int8 = 17
     @State var timer = Timer.publish(every: 1.0, on: .main, in: .common).autoconnect()
     @ObservedObject var bluetoothManager: BluetoothManager
     @Binding var patient: User
+    @State private var progress = 0.0
 
     func toggleRecording() {
         let data = (startRecording ? "start" : "stop").data(using: .utf8)!
@@ -37,6 +38,11 @@ struct RecordingView: View {
                         .font(.system(size: 34, weight: .bold))
                         .frame(maxWidth: .infinity, alignment: .center)
                         .frame(height: 400, alignment: .top)
+
+                    if startRecording && countdown <= 0 {
+                        ProgressView("Progress: \(Int(progress * 100)).0%", value: progress, total: 1)
+                            .padding(20)
+                    }
 
                     Button(action: {
                         recordingDuration = 15
@@ -76,17 +82,19 @@ struct RecordingView: View {
                             }
                             let patId = "\(patient.patientId)".data(using: .utf8)!
                             bluetoothManager.mcuPeripheral?.writeValue(patId, for: char, type: .withResponse)
-                            
+
                             toggleRecording()
                         }
                     } else {
                         recordingDuration -= 1
                         print(recordingDuration)
+                        progress = 1.0 - Double(recordingDuration) / 17.0
                         if recordingDuration <= 0 {
                             print("stopping recording...")
                             startRecording = false
                             toggleRecording()
-                            recordingDuration = 15
+                            recordingDuration = 17
+                            progress = 0.0
                         }
                     }
                 }
