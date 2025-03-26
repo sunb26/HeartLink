@@ -24,49 +24,76 @@ struct RecordingView: View {
             return
         }
         bluetoothManager.mcuPeripheral?.writeValue(data, for: char, type: .withResponse)
+        bluetoothManager.uploadingStatus = !startRecording
+        bluetoothManager.uploadProgress = 0.0
+        bluetoothManager.uploadReturnCode = "waiting"
+        progress = 0.0
     }
 
     var body: some View {
         if bluetoothManager.isConnected && bluetoothManager.wifiConnStatus == "connected" {
             ZStack {
                 VStack {
-                    Text(startRecording ? "Recording..." : "Ready to Record").font(.system(size: 42, weight: .bold))
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .frame(height: 100)
-
+                    if bluetoothManager.uploadingStatus && bluetoothManager.uploadProgress < 1 {
+                        Text("Processing File...")
+                            .font(.system(size: 42, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(height: 100)
+                    } else {
+                        Text(startRecording ? "Recording..." : "Ready to Record").font(.system(size: 42, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(height: 100)
+                    }
                     Text(countdown <= 0 ? " " : "Starts in: \(countdown)")
                         .font(.system(size: 34, weight: .bold))
                         .frame(maxWidth: .infinity, alignment: .center)
                         .frame(height: 400, alignment: .top)
 
                     if startRecording && countdown <= 0 {
-                        ProgressView("Progress: \(Int(progress * 100)).0%", value: progress, total: 1)
+                        ProgressView("Recording Progress: \(Int(progress * 100)).0%", value: progress, total: 1)
                             .padding(20)
                     }
-
-                    Button(action: {
-                        recordingDuration = 15
-                        if startRecording {
-                            startRecording = false
-                            countdown = -1
-                            toggleRecording()
-                        } else {
-                            startRecording = true
-                            countdown = 3
-                        }
-                    }) {
-                        if !startRecording { // ready to record page
-                            Image(systemName: "record.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.red)
-                        } else { // recording page
-                            Image(systemName: "stop.circle")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 80, height: 80)
-                                .foregroundColor(.red)
+                    if bluetoothManager.uploadReturnCode == "failed" {
+                        Text("Failed to Process File")
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(height: 100)
+                            .foregroundStyle(.red)
+                    } else if bluetoothManager.uploadReturnCode == "success" {
+                        Text("Processing Successful")
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .frame(height: 100)
+                    }
+                    
+                    if bluetoothManager.uploadingStatus && bluetoothManager.uploadProgress < 1 {
+                        ProgressView("Processing File: \(Int(bluetoothManager.uploadProgress * 100)).0%", value: bluetoothManager.uploadProgress, total: 1)
+                            .padding(20)
+                    } else {
+                        Button(action: {
+                            recordingDuration = 15
+                            if startRecording {
+                                startRecording = false
+                                countdown = -1
+                                toggleRecording()
+                            } else {
+                                startRecording = true
+                                countdown = 3
+                            }
+                        }) {
+                            if !startRecording { // ready to record page
+                                Image(systemName: "record.circle.fill")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 80)
+                                    .foregroundColor(.red)
+                            } else { // recording page
+                                Image(systemName: "stop.circle")
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 80, height: 80)
+                                    .foregroundColor(.red)
+                            }
                         }
                     }
                 }
@@ -95,6 +122,7 @@ struct RecordingView: View {
                             toggleRecording()
                             recordingDuration = 17
                             progress = 0.0
+                            bluetoothManager.uploadingStatus = true
                         }
                     }
                 }

@@ -14,6 +14,9 @@ let recordingServiceUUID: CBUUID = CBUUID(string: "60ec2f71-22f2-4fc4-84f0-f8d32
 let recordingCharacteristicUUID: CBUUID = CBUUID(string: "d5435c8c-392f-4e89-87be-89f9964db0e0")
 let patientInfoServiceUUID: CBUUID = CBUUID(string: "a718bad4-f9b0-40c8-bd02-de0b1335aabb")
 let patientInfoCharacteristicUUID: CBUUID = CBUUID(string: "b69a6f81-c0fa-4aab-8bdf-84796a3f0aab")
+let uploadProgressServiceUUID: CBUUID = CBUUID(string: "fa680e3d-557d-4848-b6c9-8a9e3f149184")
+let uploadProgressCharacteristicUUID: CBUUID = CBUUID(string: "c39a4162-3362-485b-a799-133e32b3ac32")
+let uploadStatusCharacterisiticUUID: CBUUID = CBUUID(string: "9ecc5e84-19c8-4120-8a0b-df0205b249ee")
 
 class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
     @Published var isBluetoothEnabled = false
@@ -22,6 +25,9 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
     @Published var isConnected = false
     @Published var wifiNetworks = [String]()
     @Published var wifiConnStatus: String = "notConnected"
+    @Published var uploadProgress: Float = 0.0
+    @Published var uploadingStatus = false
+    @Published var uploadReturnCode = "waiting"
 
     var centralManager: CBCentralManager!
     var mcuPeripheral: CBPeripheral?
@@ -29,6 +35,8 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
     var recordingCharacteristic: CBCharacteristic?
     var wifiConnStatusCharacteristic: CBCharacteristic?
     var patientInfoCharacteristic: CBCharacteristic?
+    var uploadProgressCharacteristic: CBCharacteristic?
+    var uploadStatusCharacteristic: CBCharacteristic?
 
     override init() {
         super.init()
@@ -48,7 +56,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
 
     func startScanning() {
         guard centralManager.state == .poweredOn else { return }
-        centralManager.scanForPeripherals(withServices: [wifiConnectionServiceUUID, recordingServiceUUID, patientInfoServiceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+        centralManager.scanForPeripherals(withServices: [wifiConnectionServiceUUID, recordingServiceUUID, patientInfoServiceUUID, uploadProgressServiceUUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
     }
 
     func stopScanning() {
@@ -81,7 +89,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
         stopScanning()
 
         peripheral.delegate = self
-        peripheral.discoverServices([wifiConnectionServiceUUID, recordingServiceUUID, patientInfoServiceUUID])
+        peripheral.discoverServices([wifiConnectionServiceUUID, recordingServiceUUID, patientInfoServiceUUID, uploadProgressServiceUUID])
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
@@ -96,6 +104,8 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
         }
         isConnected = false
         mcuPeripheralUUID = nil
+        uploadingStatus = false
+        uploadReturnCode = "waiting"
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {
@@ -128,6 +138,14 @@ extension BluetoothManager: CBPeripheralDelegate {
             } else if characteristic.uuid == patientInfoCharacteristicUUID {
                 print("Found patient info characteristic")
                 patientInfoCharacteristic = characteristic
+            } else if characteristic.uuid == uploadProgressCharacteristicUUID {
+                print("Found upload progress characteristic")
+                uploadProgressCharacteristic = characteristic
+                peripheral.setNotifyValue(true, for: characteristic)
+            } else if characteristic.uuid == uploadStatusCharacterisiticUUID {
+                print("Found upload status characteristic")
+                uploadStatusCharacteristic = characteristic
+                peripheral.setNotifyValue(true, for: characteristic)
             }
         }
     }
@@ -147,6 +165,21 @@ extension BluetoothManager: CBPeripheralDelegate {
                 return
             }
             wifiConnStatus = String(decoding: data, as: UTF8.self)
+        } else if characteristic.uuid == uploadProgressCharacteristicUUID {
+            guard let data = characteristic.value else {
+                print("No data received for \(characteristic.uuid.uuidString)")
+                return
+            }
+            uploadProgress = Float(String(decoding: data, as: UTF8.self)) ?? 0
+        } else if characteristic.uuid == uploadStatusCharacterisiticUUID {
+            guard let data = characteristic.value else {
+                print("No data received for \(characteristic.uuid.uuidString)")
+                return
+            }
+            uploadReturnCode = String(decoding: data, as: UTF8.self)
+            if uploadReturnCode == "failed" {
+                uploadingStatus = false
+            }
         }
     }
 }
