@@ -71,7 +71,7 @@ struct RecordingView: View {
                             .padding(20)
                     } else {
                         Button(action: {
-                            recordingDuration = 15
+                            recordingDuration = 17
                             if startRecording {
                                 startRecording = false
                                 countdown = -1
@@ -120,7 +120,6 @@ struct RecordingView: View {
                             print("stopping recording...")
                             startRecording = false
                             toggleRecording()
-                            recordingDuration = 17
                             progress = 0.0
                             bluetoothManager.uploadingStatus = true
                         }
