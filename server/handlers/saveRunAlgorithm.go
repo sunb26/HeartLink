@@ -23,6 +23,22 @@ type recording struct {
 	// status             string
 }
 
+type WAVHeader struct {
+	ChunkID       [4]byte
+	ChunkSize     uint32
+	Format        [4]byte
+	Subchunk1ID   [4]byte
+	Subchunk1Size uint32
+	AudioFormat   uint16
+	NumChannels   uint16
+	SampleRate    uint32
+	ByteRate      uint32
+	BlockAlign    uint16
+	BitsPerSample uint16
+	Subchunk2ID   [4]byte
+	Subchunk2Size uint32
+}
+
 func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Print("SaveRunAlgorithm Endpoint - Start\n") // TESTING
@@ -34,12 +50,6 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		log.Println("invalid http request type - should be POST request - instead is", r.Method)
 	}
-
-	// set 1 MB max on input file size
-	// err := r.ParseMultipartForm(32 << 15)
-	// if err != nil {
-	// 	log.Printf("Error parsing multipart form: %v\n", err)
-	// }
 
 	// connect to firebase storage
 	err := firebasedb.FirebaseDB().Connect()
@@ -56,7 +66,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	recordingId := InputJson.RecordingId
-	fmt.Printf("recordingId: %s\n", recordingId)
+	fmt.Printf("recordingId: %s\n", recordingId) // TESTING
 
 	if recordingId == "" {
 		http.Error(w, "missing required fields", http.StatusBadRequest)
@@ -83,7 +93,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	fmt.Printf("download_url: %s\n", NewRecording.DownloadUrl)
+	fmt.Printf("download_url: %s\n", NewRecording.DownloadUrl) // TESTING
 
 	// CODE FOR GETTING IN WAV FROM FIREBASE
 	localFilename := recordingId + ".wav"
@@ -104,7 +114,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 
 	// data to upload to relational database
 	bpm := detectBeats(samples, sampleRate)
-	fmt.Printf("Estimated Smoothing BPM: %.2f\n", bpm)
+	fmt.Printf("Estimated Smoothing BPM: %.2f\n", bpm) // TESTING
 
 	// delete local file after algorithm has completed
 	err = os.Remove(localFilename)
@@ -129,25 +139,11 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// w.WriteHeader(http.StatusOK)
+
 }
 
 /* Helper function definitions */
-
-type WAVHeader struct {
-	ChunkID       [4]byte
-	ChunkSize     uint32
-	Format        [4]byte
-	Subchunk1ID   [4]byte
-	Subchunk1Size uint32
-	AudioFormat   uint16
-	NumChannels   uint16
-	SampleRate    uint32
-	ByteRate      uint32
-	BlockAlign    uint16
-	BitsPerSample uint16
-	Subchunk2ID   [4]byte
-	Subchunk2Size uint32
-}
 
 func readWAV(filename string) ([]float64, uint32, error) {
 	file, err := os.Open(filename)

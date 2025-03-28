@@ -161,7 +161,7 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 	defer tx.Rollback()
 
 	var status string = "notSubmitted" // always set to notSubmitted when first uploaded
-	result, err := tx.Exec("INSERT INTO recordings (patient_id, download_url, recording_datetime, status) VALUES ($1, $2, $3, $4)", userID, publicURL, time.Now(), status)
+	_, err = tx.Exec("INSERT INTO recordings (patient_id, download_url, recording_datetime, status) VALUES ($1, $2, $3, $4)", userID, publicURL, time.Now(), status)
 	if err != nil {
 		log.Printf("Error inserting new recording into database: %v\n", err)
 	}
@@ -173,9 +173,7 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
-
-	fmt.Printf("result: %v\n", result) // TESTING
+	// w.WriteHeader(http.StatusOK)
 
 	// populate data to send back to client - not sure if needed/following this convention
 	// data := make(map[string]interface{})
