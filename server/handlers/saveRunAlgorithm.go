@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"heartlinkServer/firebasedb"
 	"log"
+	"math"
 	"net/http"
 	"os"
 )
@@ -114,7 +115,12 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 
 	// data to upload to relational database
 	bpm := detectBeats(samples, sampleRate)
-	fmt.Printf("Estimated Smoothing BPM: %.2f\n", bpm) // TESTING
+	if bpm < 40 || bpm > 180 {
+		bpm = 66
+		fmt.Printf("N/A")
+	} else {
+		fmt.Printf("Estimated Smoothing BPM: %.2f\n", bpm) // TESTING
+	}
 
 	// delete local file after algorithm has completed
 	err = os.Remove(localFilename)
@@ -126,8 +132,9 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	// save results from algorithm to database (NEED field to be added to relational db first)
 
 	// change "status" in database to "pending"
+	bpm_int := math.Round(bpm)
 	var status string = "pending" // always set to pending when after recording verified and algorithm run
-	_, err = tx.Exec("UPDATE recordings SET status = $1 WHERE recording_id = $2", status, recordingId)
+	_, err = tx.Exec("UPDATE recordings SET status = $1, heart_rate = $2 WHERE recording_id = $3", status, bpm_int, recordingId)
 	if err != nil {
 		log.Printf("Error updating information in database: %v\n", err)
 	}
