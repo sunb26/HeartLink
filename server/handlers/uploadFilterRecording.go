@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"heartlinkServer/firebasedb"
 	"io"
@@ -11,11 +10,12 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
 
-func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
+func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 	// ensure receiving POST request
 	if r.Method != "POST" {
@@ -24,7 +24,8 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprint(w, "UploadFilterRecording Endpoint - Start\n") // Arduino expects response when sends POST request
 
-	err := r.ParseMultipartForm(32 << 15) // set 1 MB max on input file size
+	// set 1 MB max on input file size
+	err := r.ParseMultipartForm(32 << 15)
 	if err != nil {
 		log.Printf("Error parsing multipart form: %v\n", err)
 	}
@@ -50,6 +51,7 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 	/* END COMMENT OUT WHEN COMMITTING - FOR RUNNING WITH LOCAL HOST ONLY */
 
 	var newFile uploadedFile
+	var publicURL string
 
 	// connect to firebase storage (do this before receive file)
 	errFB := firebasedb.FirebaseDB().Connect()
@@ -84,8 +86,6 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 				log.Printf("Error reading file: %v\n", err)
 				return
 			}
-
-			fmt.Fprint(w, "server: file size: ", fileSize, "\n") // TESTING - proves endpoint receiving entire file
 
 			file.Seek(0, 0)
 
@@ -137,7 +137,7 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 			// upload the filtered audio recording to Firebase
 			filePath := "recordings/" + newFile.Filename
-			publicURL, err := firebasedb.FirebaseDB().UploadWAVToFirebase(resp.Body, filePath)
+			publicURL, err = firebasedb.FirebaseDB().UploadWAVToFirebase(resp.Body, filePath)
 			if err != nil {
 				log.Printf("Error uploading WAV file to Firebase Storage: %v\n", err)
 			}
@@ -151,18 +151,42 @@ func UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 	userIDWav := newFile.Filename
 	userID := strings.Split(strings.Split(userIDWav, "_")[2], ".")[0] // extract userID from filename
-	fmt.Printf("userID: %v\n", userID)                                // TESTING - will need to upload userID to relational database
 
-	// populate data to send back to client
-	data := make(map[string]interface{})
-	data["form_field_value"] = newFile.Filename
-	data["status"] = 200
-
-	// send data back to the client
-	if err = json.NewEncoder(w).Encode(data); err != nil {
-		log.Printf("Error encoding JSON: %v\n", err)
+	// send userID + public firebase recording link to relational database
+	tx, err := env.DB.Beginx() // setup database connection
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer tx.Rollback()
+
+	var status string = "notSubmitted" // always set to notSubmitted when first uploaded
+	result, err := tx.Exec("INSERT INTO recordings (patient_id, download_url, recording_datetime, status) VALUES ($1, $2, $3, $4)", userID, publicURL, time.Now(), status)
+	if err != nil {
+		log.Printf("Error inserting new recording into database: %v\n", err)
+	}
+
+	// commit transaction to database
+	err = tx.Commit()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+
+	fmt.Printf("result: %v\n", result) // TESTING
+
+	// populate data to send back to client - not sure if needed/following this convention
+	// data := make(map[string]interface{})
+	// data["form_field_value"] = newFile.Filename
+	// data["status"] = 200
+
+	// send data back to the client
+	// if err = json.NewEncoder(w).Encode(data); err != nil {
+	// 	log.Printf("Error encoding JSON: %v\n", err)
+	// 	return
+	// }
 
 	fmt.Fprint(w, "UploadFilterRecording Endpoint - End\n") // TESTING
 }

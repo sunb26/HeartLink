@@ -1,5 +1,3 @@
-// main.go file
-
 package main
 
 import (
@@ -47,9 +45,10 @@ func main() {
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
 	// each HandleFunc is used to handle a specific endpoint
-	mux.HandleFunc("/UploadFilterRecording", handlers.UploadFilterRecording)
+	mux.HandleFunc("/UploadFilterRecording", env.UploadFilterRecording)
 	mux.HandleFunc("/createPhysician", env.CreatePhysician)
 	mux.HandleFunc("/listPatients", env.ListPatients)
+	// mux.HandleFunc("/SaveRunAlgorithm", env.SaveRunAlgorithm)
 
 	log.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
