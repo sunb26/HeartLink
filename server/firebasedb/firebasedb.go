@@ -1,5 +1,3 @@
-// firebasedb.go file
-
 package firebasedb
 
 import (
@@ -7,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -70,6 +69,41 @@ func (db *FireDB) UploadWAVToFirebase(fileContent io.ReadCloser, storagePath str
 	}
 
 	return attrs.MediaLink, nil
+
+}
+
+func (db *FireDB) DownloadWAVFromFirebase(firebaseURL string, localFilePath string) error {
+
+	// get WAV file from Firebase storage
+	response, err := http.Get(firebaseURL)
+	if err != nil {
+		log.Printf("Error getting file from Firebase Storage: %v\n", err)
+		return err
+	}
+	defer response.Body.Close()
+
+	// check if response was successful
+	if response.StatusCode != http.StatusOK {
+		log.Printf("Bad status code: %d", response.StatusCode)
+		return fmt.Errorf("error code: %d", response.StatusCode)
+	}
+
+	// create local file to write WAV file to
+	tempFile, err := os.Create(localFilePath)
+	if err != nil {
+		log.Printf("Error creating local file: %v\n", err)
+		return err
+	}
+	defer tempFile.Close()
+
+	// copy the contents into temp file
+	_, err = io.Copy(tempFile, response.Body)
+	if err != nil {
+		log.Printf("Error copying file contents: %v\n", err)
+		return err
+	}
+
+	return nil
 
 }
 
