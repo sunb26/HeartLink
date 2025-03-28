@@ -27,7 +27,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
     @Published var wifiConnStatus: String = "notConnected"
     @Published var uploadProgress: Float = 0.0
     @Published var uploadingStatus = false
-    @Published var uploadReturnCode = "waiting"
+    @Published var uploadReturnCode = "idle"
 
     var centralManager: CBCentralManager!
     var mcuPeripheral: CBPeripheral?
@@ -101,11 +101,12 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
             print("Error in disconnecting \(peripheral.name ?? "Unknown"): \(error.localizedDescription)")
         } else {
             print("Successfully disconnected from \(peripheral.name ?? "Unknown")")
-        }
+        }Yu
         isConnected = false
         mcuPeripheralUUID = nil
         uploadingStatus = false
-        uploadReturnCode = "waiting"
+        uploadReturnCode = "idle"
+        wifiConnStatus = "notConnected"
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String: Any], rssi RSSI: NSNumber) {

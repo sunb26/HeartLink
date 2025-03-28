@@ -26,7 +26,7 @@ struct RecordingView: View {
         bluetoothManager.mcuPeripheral?.writeValue(data, for: char, type: .withResponse)
         bluetoothManager.uploadingStatus = !startRecording
         bluetoothManager.uploadProgress = 0.0
-        bluetoothManager.uploadReturnCode = "waiting"
+        bluetoothManager.uploadReturnCode = "idle"
         progress = 0.0
     }
 
@@ -34,7 +34,7 @@ struct RecordingView: View {
         if bluetoothManager.isConnected && bluetoothManager.wifiConnStatus == "connected" {
             ZStack {
                 VStack {
-                    if bluetoothManager.uploadingStatus && bluetoothManager.uploadProgress < 1 {
+                    if bluetoothManager.uploadingStatus && bluetoothManager.uploadReturnCode == "idle" {
                         Text("Processing File...")
                             .font(.system(size: 42, weight: .bold))
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -54,7 +54,7 @@ struct RecordingView: View {
                             .padding(20)
                     }
                     if bluetoothManager.uploadReturnCode == "failed" {
-                        Text("Failed to Process File")
+                        Text("Failed to Process File. Please Try Again.")
                             .font(.system(size: 20, weight: .bold))
                             .frame(maxWidth: .infinity, alignment: .center)
                             .frame(height: 100)
@@ -65,8 +65,8 @@ struct RecordingView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                             .frame(height: 100)
                     }
-                    
-                    if bluetoothManager.uploadingStatus && bluetoothManager.uploadProgress < 1 {
+
+                    if bluetoothManager.uploadingStatus && bluetoothManager.uploadReturnCode == "idle" {
                         ProgressView("Processing File: \(Int(bluetoothManager.uploadProgress * 100)).0%", value: bluetoothManager.uploadProgress, total: 1)
                             .padding(20)
                     } else {
