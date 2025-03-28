@@ -64,8 +64,8 @@ table "patient" {
     comment = "Date of Birth"
   }
   column "last_updated" {
-    null = false
-    type = timestamptz
+    null    = false
+    type    = timestamptz
     comment = "Last time the patient information was updated (NOT including new recordings)."
   }
   primary_key {
@@ -117,6 +117,11 @@ table "recordings" {
     null    = false
     type    = enum.view_status
     default = "notSubmitted"
+  }
+  column "heart_rate" {
+    null    = true
+    type    = integer
+    comment = "Heart Rate calculated via the algorithm."
   }
   primary_key {
     columns = [column.recording_id]
