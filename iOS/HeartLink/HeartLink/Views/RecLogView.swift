@@ -70,7 +70,7 @@ struct RecLogView: View {
                                     Button("Submit", action: {
                                         Task {
                                             do {
-                                                let submission = RecordingSubmission(recordingId: recording.id, url: recording.fileURL)
+                                                let submission = RecordingSubmission(recordingId: recording.id)
                                                 try await submit(submission: submission)
                                                 recording.viewStatus = "submitted"
                                             } catch {

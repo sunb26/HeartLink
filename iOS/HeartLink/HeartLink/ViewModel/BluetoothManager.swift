@@ -101,7 +101,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, ObservableObject {
             print("Error in disconnecting \(peripheral.name ?? "Unknown"): \(error.localizedDescription)")
         } else {
             print("Successfully disconnected from \(peripheral.name ?? "Unknown")")
-        }Yu
+        }
         isConnected = false
         mcuPeripheralUUID = nil
         uploadingStatus = false

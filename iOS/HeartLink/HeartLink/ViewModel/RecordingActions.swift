@@ -36,7 +36,7 @@ func getRecording(recordingId: UInt64) async throws -> RecordingData {
 }
 
 func submit(submission: RecordingSubmission) async throws {
-    guard let url = URL(string: "https://heartlink.free.beeceptor.com/recording/submit") else {
+    guard let url = URL(string: "https://heartlink-652851748566.northamerica-northeast2.run.app/SaveRunAlgorithm") else {
         throw RecordingError.invalidURL
     }
     var request = URLRequest(url: url)
@@ -46,20 +46,22 @@ func submit(submission: RecordingSubmission) async throws {
     do {
         let jsonData = try JSONEncoder().encode(submission)
         request.httpBody = jsonData
-
+        
         let (_, response) = try await URLSession.shared.data(for: request)
 
         guard let response = response as? HTTPURLResponse else {
+            print("Invalid URL")
             throw RecordingError.serverError
         }
 
         guard response.statusCode == 200 else {
+            print("Response Code: \(response.statusCode)")
             throw RecordingError.serverError
         }
         print("submitted successfully")
         return
     } catch {
-        print("failed to encode submission")
+        print("failed to encode submission: \(error)")
     }
 }
 

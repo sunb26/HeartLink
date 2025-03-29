@@ -27,7 +27,6 @@ struct RecordingData: Codable {
 
 struct RecordingSubmission: Codable {
     let recordingId: UInt64
-    let url: String
 }
 
 enum RecordingError: Error {
