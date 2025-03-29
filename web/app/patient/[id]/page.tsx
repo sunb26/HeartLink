@@ -3,7 +3,7 @@ import { DataTable } from "@/components/ui/recordings/data-table";
 import Image from "next/image";
 import React from "react";
 
-export default async function PatientPage({ params }: { params: { id: string } }) {
+export default async function PatientPage({params}: {params: Promise<{ id: string }>}) {
   const { id } = await params;
   console.log("PatientId:", id);
   const response = await fetch(`${process.env.SERVER_URL}/GetPatient?patientId=${id}`, {
