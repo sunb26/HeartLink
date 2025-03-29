@@ -74,8 +74,8 @@ table "patient" {
   foreign_key "physician_id" {
     columns     = [column.physician_id]
     ref_columns = [table.physician.column.physician_id]
-    on_update   = NO_ACTION
-    on_delete   = NO_ACTION
+    on_update   = CASCADE
+    on_delete   = CASCADE
   }
 }
 table "physician" {
