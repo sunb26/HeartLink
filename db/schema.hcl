@@ -127,6 +127,7 @@ table "recordings" {
     null    = true
     type    = text
     comment = "Physician leaves comments on each recording to be displayed back on the app for the patient."
+    default = ""
   }
   primary_key {
     columns = [column.recording_id]
