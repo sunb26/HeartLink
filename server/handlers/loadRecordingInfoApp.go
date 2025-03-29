@@ -11,6 +11,8 @@ import (
 type recordingInfo struct {
 	Status            string `db:"status" json:"status"`
 	PhysicianComments string `db:"physician_comments" json:"physicianComments"`
+	RecordingId       string `db:"recording_id" json:"recordingId"`
+	DownloadUrl       string `db:"download_url" json:"downloadUrl"`
 }
 
 func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
@@ -22,7 +24,7 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		log.Println("invalid http request type - should be GET request - instead is", r.Method)
 	}
 
-	NewRecording := recordingInfo{}
+	newRecording := []recordingInfo{}
 
 	// parse query parameter from URL
 	u, err := url.Parse(r.URL.String())
@@ -41,15 +43,13 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 
 	recordingId := q.Get("recordingid")
 
-	fmt.Printf("recordingId: %s\n", recordingId) // TESTING
-
 	// verify URL contained required inputs
 	if recordingId == "" {
 		http.Error(w, "missing required URL inputs", http.StatusBadRequest)
 		return
 	}
 
-	// setup database connection
+	// start transaction
 	tx, err := env.DB.Beginx()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -57,11 +57,13 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	// get view status and physician comments from database
-	err = tx.Get(&NewRecording,
+	// select view status and physician comments from database
+	err = tx.Select(&newRecording,
 		`SELECT
 		r.status,
-		r.physician_comments
+		r.physician_comments,
+		r.recording_id, 
+		r.download_url
 	FROM
 		recordings r
 	WHERE recording_id = $1`, recordingId)
@@ -70,12 +72,20 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	fmt.Printf("status: %s\n", NewRecording.Status)                        // TESTING
-	fmt.Printf("physician comments: %s\n", NewRecording.PhysicianComments) // TESTING
+	err = tx.Commit()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	fmt.Printf("status: %s\n", newRecording[0].Status)                        // TESTING
+	fmt.Printf("physician comments: %s\n", newRecording[0].PhysicianComments) // TESTING
+	fmt.Printf("recording id: %s\n", newRecording[0].RecordingId)             // TESTING
+	fmt.Printf("download url: %s\n", newRecording[0].DownloadUrl)             // TESTING
 
 	// create JSON response
 	data := make(map[string]interface{})
-	data["recording"] = NewRecording // SEE HOW BEN WANTS THIS LABELLED
+	data["recording"] = newRecording
 
 	w.Header().Set("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(data); err != nil {
@@ -83,6 +93,6 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		log.Printf("LoadRecordingInfoApp: Error encoding JSON: %v\n", err)
 		return
 	}
-	log.Printf("LoadRecordingInfoApp Response: %v\n", NewRecording)
+	log.Printf("LoadRecordingInfoApp Response: %v\n", newRecording)
 
 }

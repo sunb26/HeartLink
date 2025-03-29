@@ -49,7 +49,6 @@ func main() {
 	mux.HandleFunc("/CreatePhysician", env.CreatePhysician)
 	mux.HandleFunc("/ListPatients", env.ListPatients)
 	mux.HandleFunc("/SaveRunAlgorithm", env.SaveRunAlgorithm)
-	mux.HandleFunc("/StreamRecordingApp", env.StreamRecordingApp)
 	mux.HandleFunc("/LoadRecordingInfoApp", env.LoadRecordingInfoApp)
 	mux.HandleFunc("/CreatePatient", env.CreatePatient)
 	mux.HandleFunc("/SubmitComments", env.SubmitComments)
