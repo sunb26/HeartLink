@@ -6,7 +6,7 @@ import React from "react";
 export default async function PatientPage({params}: {params: Promise<{ id: string }>}) {
   const { id } = await params;
   console.log("PatientId:", id);
-  const response = await fetch(`${process.env.SERVER_URL}/GetPatient?patientId=${id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/GetPatient?patientId=${id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

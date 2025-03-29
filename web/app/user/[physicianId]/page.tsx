@@ -5,7 +5,7 @@ import { currentUser } from "@clerk/nextjs/server";
 
 export default async function PhysicianPage() {
   const physician = await currentUser();
-  const response = await fetch(`${process.env.SERVER_URL}/ListPatients?physicianid=${physician?.id}`, {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/ListPatients?physicianid=${physician?.id}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

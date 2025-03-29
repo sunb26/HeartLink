@@ -39,12 +39,12 @@ export function CommentForm( { recordingId }: { recordingId: number }) {
       recordingId: recordingId,
       comments: data.comments,
     };
-    const reqOptioons = {
+    const reqOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(d),
     };
-    fetch(`${process.env.SERVER_URL}/SubmitComments`, reqOptioons).then(
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/SubmitComments`, reqOptions).then(
       (res) => {
         if (res.ok) {
           setSubmitted(true);
