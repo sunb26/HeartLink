@@ -53,6 +53,7 @@ func main() {
 	mux.HandleFunc("/CreatePatient", env.CreatePatient)
 	mux.HandleFunc("/SubmitComments", env.SubmitComments)
 	mux.HandleFunc("/GetPatient", env.GetPatient)
+	mux.HandleFunc("/DeleteRecording", env.DeleteRecording)
 
 	log.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
