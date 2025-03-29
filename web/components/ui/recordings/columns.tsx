@@ -50,7 +50,7 @@ export const columns: ColumnDef<Recording>[] = [
                 </audio>
               </div>
               <div className="grid w-full gap-4">
-                <CommentForm />
+                <CommentForm recordingId={row.original.recordingId} />
               </div>
             </DialogContent>
           </DialogTitle>

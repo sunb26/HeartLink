@@ -22,7 +22,12 @@ const FormSchema = z.object({
   }),
 });
 
-export function CommentForm() {
+type reqBody = {
+  recordingId: number,
+  comments: string,
+}
+
+export function CommentForm( { recordingId }: { recordingId: number }) {
   const [submitted, setSubmitted] = useState(false);
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -30,12 +35,16 @@ export function CommentForm() {
   });
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
+    const d: reqBody = {
+      recordingId: recordingId,
+      comments: data.comments,
+    };
     const reqOptioons = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
+      body: JSON.stringify(d),
     };
-    fetch("https://heartlink.free.beeceptor.com/todos", reqOptioons).then(
+    fetch(`${process.env.SERVER_URL}/SubmitComments`, reqOptioons).then(
       (res) => {
         if (res.ok) {
           setSubmitted(true);
@@ -78,12 +87,12 @@ export function CommentForm() {
         >
           Submit
         </Button>
-        {submitted && (
+      </form>
+      {submitted && (
           <FormMessage className="text-green-900 font-bold">
             Your comments have been submitted successfully.
           </FormMessage>
         )}
-      </form>
     </Form>
   );
 }
