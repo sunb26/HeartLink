@@ -49,6 +49,8 @@ func main() {
 	mux.HandleFunc("/createPhysician", env.CreatePhysician)
 	mux.HandleFunc("/listPatients", env.ListPatients)
 	mux.HandleFunc("/SaveRunAlgorithm", env.SaveRunAlgorithm)
+	// mux.HandleFunc("/StreamRecordingApp", env.StreamRecordingApp)
+	mux.HandleFunc("/LoadRecordingInfoApp", env.LoadRecordingInfoApp)
 
 	log.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
