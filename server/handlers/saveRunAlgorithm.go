@@ -9,19 +9,21 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 type inputJson struct {
 	RecordingId string `json:"recordingId"`
 }
 
-type recording struct {
-	// patientId          string
-	// recordingId        string
-	// downloadUrl        string
-	// recording_datetime string
+type recordingAlgo struct {
+	// PatientId         string         `db:"patient_id"`
+	// RecordingId       string         `db:"recording_id"`
+	// RecordingDateTime string         `db:"recording_datetime"`
 	DownloadUrl string `db:"download_url"`
-	// status             string
+	// Status            string         `db:"status"`
+	// HeartRate         int            `db:"heart_rate"`
+	// PhysicianComments sql.NullString `db:"physician_comments"`
 }
 
 type WAVHeader struct {
@@ -45,7 +47,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	fmt.Print("SaveRunAlgorithm Endpoint - Start\n") // TESTING
 
 	var InputJson inputJson
-	NewRecording := recording{}
+	NewRecording := recordingAlgo{}
 
 	// ensure receiving POST request
 	if r.Method != "POST" {
@@ -62,14 +64,23 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	// decode POST request inputs from json body
 	err = json.NewDecoder(r.Body).Decode(&InputJson)
 	if err != nil {
+		log.Printf("Error decoding JSON: %v\n", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	recordingId := InputJson.RecordingId
-	fmt.Printf("recordingId: %s\n", recordingId) // TESTING
+	// convert RecordingId from string to uint64
+	recordingId, err := strconv.ParseUint(InputJson.RecordingId, 10, 64)
+	if err != nil {
+		log.Printf("Error converting recordingId to uint: %v\n", err)
+		http.Error(w, "Invalid recordingId format", http.StatusBadRequest)
+		return
+	}
 
-	if recordingId == "" {
+	fmt.Printf("recordingId: %d\n", recordingId) // TESTING
+
+	// verify URL contains the required inputs
+	if recordingId == 0 {
 		http.Error(w, "missing required fields", http.StatusBadRequest)
 		return
 	}
@@ -82,7 +93,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	// get url from database
+	// get download url from database
 	err = tx.Get(&NewRecording,
 		`SELECT
 		r.download_url
@@ -97,7 +108,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("download_url: %s\n", NewRecording.DownloadUrl) // TESTING
 
 	// CODE FOR GETTING IN WAV FROM FIREBASE
-	localFilename := recordingId + ".wav"
+	localFilename := strconv.FormatUint(recordingId, 10) + ".wav"
 	err = firebasedb.FirebaseDB().DownloadWAVFromFirebase(NewRecording.DownloadUrl, localFilename)
 	if err != nil {
 		log.Printf("Error downloading WAV file from Firebase: %v\n", err)
