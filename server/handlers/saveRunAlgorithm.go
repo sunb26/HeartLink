@@ -17,13 +17,7 @@ type inputJson struct {
 }
 
 type recordingAlgo struct {
-	// PatientId         string         `db:"patient_id"`
-	// RecordingId       string         `db:"recording_id"`
-	// RecordingDateTime string         `db:"recording_datetime"`
 	DownloadUrl string `db:"download_url"`
-	// Status            string         `db:"status"`
-	// HeartRate         int            `db:"heart_rate"`
-	// PhysicianComments sql.NullString `db:"physician_comments"`
 }
 
 type WAVHeader struct {
@@ -69,14 +63,6 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// convert RecordingId from string to uint64
-	// recordingId, err := strconv.ParseUint(InputJson.RecordingId, 10, 64)
-	// if err != nil {
-	// 	log.Printf("Error converting recordingId to uint: %v\n", err)
-	// 	http.Error(w, "Invalid recordingId format", http.StatusBadRequest)
-	// 	return
-	// }
-
 	recordingId := InputJson.RecordingId
 	fmt.Printf("recordingId: %d\n", recordingId) // TESTING
 
@@ -86,7 +72,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// setup database connection
+	// start transaction
 	tx, err := env.DB.Beginx()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -141,9 +127,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error deleting local file", http.StatusInternalServerError)
 	}
 
-	// save results from algorithm to database (NEED field to be added to relational db first)
-
-	// change "status" in database to "pending"
+	// save results from algorithm to database
 	bpm_int := math.Round(bpm)
 	var status string = "pending" // always set to pending when after recording verified and algorithm run
 	_, err = tx.Exec("UPDATE recordings SET status = $1, heart_rate = $2 WHERE recording_id = $3", status, bpm_int, recordingId)

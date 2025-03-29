@@ -78,19 +78,6 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 			file.Seek(0, 0)
 
-			newFile.ContentType = http.DetectContentType(buff)
-
-			var sizeBuff bytes.Buffer
-			fileSize, err := sizeBuff.ReadFrom(file)
-			if err != nil {
-				log.Printf("Error reading file: %v\n", err)
-				return
-			}
-
-			file.Seek(0, 0)
-
-			newFile.Size = fileSize
-
 			key := uuid.New() // generate key to act as access token in firebase storage
 
 			newFile.Filename = key.String() + "_" + headers.Filename
