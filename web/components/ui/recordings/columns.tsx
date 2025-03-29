@@ -12,14 +12,14 @@ import {
 import { CommentForm } from "@/components/ui/recordings/form";
 
 export type Recording = {
-  id: number;
-  date: string;
-  url: string;
+  recordingId: number;
+  recordingDateTime: string;
+  downloadUrl: string;
 };
 
 export const columns: ColumnDef<Recording>[] = [
   {
-    accessorKey: "date",
+    accessorKey: "recordingDateTime",
     header: ({ column }) => {
       return (
         <Button
@@ -37,7 +37,7 @@ export const columns: ColumnDef<Recording>[] = [
         <Dialog>
           <DialogTrigger asChild>
             <Button variant="ghost" className="pl-0 w-full justify-start">
-              {row.original.date}
+              {row.original.recordingDateTime}
             </Button>
           </DialogTrigger>
           <DialogTitle>
@@ -45,7 +45,7 @@ export const columns: ColumnDef<Recording>[] = [
               <div className="bg-slate-400 p-8 rounded-lg">
                 {/* biome-ignore lint/a11y/useMediaCaption: heart sounds don't require CC */}
                 <audio controls>
-                  <source src={row.original.url} type="audio/wav" />
+                  <source src={row.original.downloadUrl} type="audio/wav" />
                   Your browser does not support the audio element.
                 </audio>
               </div>

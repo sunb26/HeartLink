@@ -58,9 +58,9 @@ export function DataTable<TData, TValue>({
       <div className="flex items-center py-4">
         <Input
           placeholder="Filter dates..."
-          value={(table.getColumn("date")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("recordingDateTime")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
-            table.getColumn("date")?.setFilterValue(event.target.value)
+            table.getColumn("recordingDateTime")?.setFilterValue(event.target.value)
           }
         />
       </div>
