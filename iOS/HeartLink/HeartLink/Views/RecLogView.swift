@@ -28,8 +28,8 @@ struct RecLogView: View {
                     Text("Recording")
                         .font(.title).fontWeight(.bold)
                         .foregroundColor(.black)
-                    Text("ID: \(recording.id)")
-                    if recording.viewStatus == "viewed" {
+                    Text("ID: \(recording.recordingId)")
+                    if recording.status == "viewed" {
                         VStack(alignment: .leading) {
                             HStack {
                                 Text("View Status:")
@@ -42,14 +42,14 @@ struct RecLogView: View {
                                     .font(.title2)
                                     .bold()
                                 ScrollView {
-                                    Text(recording.comments)
+                                    Text(recording.physicianComments)
                                         .multilineTextAlignment(.leading)
                                         .font(.system(size: 20))
                                 }
                             }
                             .padding(.top, 25)
                         }
-                    } else if recording.viewStatus == "notSubmitted" {
+                    } else if recording.status == "notSubmitted" {
                         VStack(alignment: .leading) {
                             HStack {
                                 Text("View Status:")
@@ -70,9 +70,9 @@ struct RecLogView: View {
                                     Button("Submit", action: {
                                         Task {
                                             do {
-                                                let submission = RecordingSubmission(recordingId: recording.id)
+                                                let submission = RecordingSubmission(recordingId: recording.recordingId)
                                                 try await submit(submission: submission)
-                                                recording.viewStatus = "submitted"
+                                                recording.status = "pending"
                                             } catch {
                                                 print("error submitting recording: \(error)")
                                             }
@@ -90,7 +90,7 @@ struct RecLogView: View {
                                     Button("Delete Recording", role: .destructive) {
                                         Task {
                                             do {
-                                                try await delete(recordingId: recording.id)
+                                                try await delete(recordingId: recording.recordingId)
                                                 path.removeLast(path.count)
                                             } catch {
                                                 print("error deleting record: \(error)")
@@ -100,7 +100,7 @@ struct RecLogView: View {
                                 }
                             }
                         }
-                    } else if recording.viewStatus == "pending" {
+                    } else if recording.status == "pending" {
                         HStack {
                             Text("View Status:")
                             Text("Submitted - Under Review")
@@ -144,25 +144,19 @@ struct RecLogView: View {
     }
 
     func setupPlayer() {
-        let storage = Storage.storage().reference(forURL: recording.fileURL)
-        storage.downloadURL { url, error in
-            if error != nil {
-                print("display recording data: \(String(describing: error))")
-            } else {
-                do {
-                    try
-                        // Playback even with notifications silenced
-                        AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
-                } catch {
-                    print("display recording data: \(String(describing: error))")
-                }
-                self.player = AVPlayer(url: url!)
-
-                Task {
-                    let totalTime = try await player.currentItem?.asset.load(.duration)
-                    self.duration = totalTime?.seconds ?? 0
-                }
-            }
+        let storageUrl = URL(string: recording.downloadUrl)!
+        do {
+            try
+                // Playback even with notifications silenced
+                AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+        } catch {
+            print("display recording data: \(String(describing: error))")
+        }
+        player = AVPlayer(url: storageUrl)
+        print("URL: \(storageUrl)")
+        Task {
+            let totalTime = try await player.currentItem?.asset.load(.duration)
+            self.duration = totalTime?.seconds ?? 0
         }
     }
 
@@ -223,6 +217,6 @@ struct RecLogView: View {
 
 #Preview {
     @Previewable @State var path: [PageActions] = [.recording]
-    @Previewable @State var record = RecordingData(id: 0, date: "2025-01-01", viewStatus: "notSubmitted", comments: "Test", fileURL: "gs://heartlink-6fee0.firebasestorage.app/recordings/chillin39-20915.wav")
+    @Previewable @State var record = RecordingData(recordingId: 0, status: "notSubmitted", physicianComments: "Test", downloadUrl: "gs://heartlink-6fee0.firebasestorage.app/recordings/chillin39-20915.wav")
     RecLogView(path: $path, recording: $record)
 }

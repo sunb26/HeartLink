@@ -14,15 +14,14 @@ struct RecordingsList: Codable {
 
 struct RecordingWidget: Identifiable, Codable {
     let id: UInt64
-    let date: String
+    let recordingDateTime: String
 }
 
 struct RecordingData: Codable {
-    let id: UInt64
-    let date: String
-    var viewStatus: String
-    let comments: String
-    let fileURL: String
+    let recordingId: UInt64
+    var status: String
+    let physicianComments: String
+    let downloadUrl: String
 }
 
 struct RecordingSubmission: Codable {

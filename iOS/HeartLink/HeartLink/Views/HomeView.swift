@@ -65,7 +65,7 @@ struct HomeView: View {
                                 .foregroundColor(Color("custom-red"))
 
                             VStack(alignment: .leading) {
-                                Text(recording.date)
+                                Text(recording.recordingDateTime)
                                     .font(.headline)
                                     .scaledToFit()
                             }
@@ -94,6 +94,9 @@ struct HomeView: View {
                         }
                     }
                     .listStyle(PlainListStyle())
+                    .refreshable{
+                        listRecordings()
+                    }
                 }
             }
         }
@@ -105,7 +108,7 @@ struct HomeView: View {
     }
 
     func listRecordings() {
-        guard let url = URL(string: "https://heartlink.free.beeceptor.com/listRecordings") else {
+        guard let url = URL(string: "https://heartlink2.free.beeceptor.com/listRecordings") else {
             print("invalid URL")
             return
         }
