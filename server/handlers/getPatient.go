@@ -20,7 +20,7 @@ type PatientPage struct {
 
 type Recording struct {
 	RecordingId       int    `db:"recording_id" json:"recordingId"`
-	RecordingDateTime string `db:"recording_datetime"`
+	RecordingDateTime string `db:"recording_datetime" json:"recordingDateTime"`
 	DownloadUrl       string `db:"download_url" json:"downloadUrl"`
 }
 
