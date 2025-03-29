@@ -15,7 +15,12 @@ func logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 		next.ServeHTTP(w, r)
-		log.Printf("%s %s %s\n", r.Method, r.URL.Path, time.Since(start))
+		log.Printf("%s %s %s %s\n", r.Method, r.URL.Path, r.Response.Status, time.Since(start))
+
+		// Set headers for CORS
+		w.Header().Set("Access-Control-Allow-Origin", "https://heartlink-alpha.vercel.app")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 	})
 }
 
