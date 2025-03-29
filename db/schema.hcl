@@ -123,6 +123,11 @@ table "recordings" {
     type    = integer
     comment = "Heart Rate calculated via the algorithm."
   }
+  column "physician_comments" {
+    null    = true
+    type    = text
+    comment = "Physician leaves comments on each recording to be displayed back on the app for the patient."
+  }
   primary_key {
     columns = [column.recording_id]
   }
