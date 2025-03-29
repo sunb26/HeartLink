@@ -46,13 +46,14 @@ func main() {
 
 	// each HandleFunc is used to handle a specific endpoint
 	mux.HandleFunc("/UploadFilterRecording", env.UploadFilterRecording)
-	mux.HandleFunc("/createPhysician", env.CreatePhysician)
-	mux.HandleFunc("/listPatients", env.ListPatients)
+	mux.HandleFunc("/CreatePhysician", env.CreatePhysician)
+	mux.HandleFunc("/ListPatients", env.ListPatients)
 	mux.HandleFunc("/SaveRunAlgorithm", env.SaveRunAlgorithm)
 	mux.HandleFunc("/StreamRecordingApp", env.StreamRecordingApp)
 	mux.HandleFunc("/LoadRecordingInfoApp", env.LoadRecordingInfoApp)
-	mux.HandleFunc("/createPatient", env.CreatePatient)
-	mux.HandleFunc("/submitComments", env.SubmitComments)
+	mux.HandleFunc("/CreatePatient", env.CreatePatient)
+	mux.HandleFunc("/SubmitComments", env.SubmitComments)
+	mux.HandleFunc("/GetPatient", env.GetPatient)
 
 	log.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
