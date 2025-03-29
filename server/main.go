@@ -20,7 +20,7 @@ func logging(next http.Handler) http.Handler {
 		// Set headers for CORS
 		w.Header().Set("Access-Control-Allow-Origin", "https://heartlink-alpha.vercel.app")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, application/json")
 	})
 }
 
