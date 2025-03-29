@@ -11,7 +11,7 @@ import (
 type recordingInfo struct {
 	Status            string `db:"status" json:"status"`
 	PhysicianComments string `db:"physician_comments" json:"physicianComments"`
-	RecordingId       string `db:"recording_id" json:"recordingId"`
+	RecordingId       uint64 `db:"recording_id" json:"recordingId"`
 	DownloadUrl       string `db:"download_url" json:"downloadUrl"`
 }
 
@@ -80,7 +80,7 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Printf("status: %s\n", newRecording[0].Status)                        // TESTING
 	fmt.Printf("physician comments: %s\n", newRecording[0].PhysicianComments) // TESTING
-	fmt.Printf("recording id: %s\n", newRecording[0].RecordingId)             // TESTING
+	fmt.Printf("recording id: %d\n", newRecording[0].RecordingId)             // TESTING
 	fmt.Printf("download url: %s\n", newRecording[0].DownloadUrl)             // TESTING
 
 	// create JSON response
