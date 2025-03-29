@@ -13,7 +13,7 @@ import (
 )
 
 type inputJson struct {
-	RecordingId string `json:"recordingId"`
+	RecordingId uint64 `json:"recordingId"`
 }
 
 type recordingAlgo struct {
@@ -70,13 +70,14 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// convert RecordingId from string to uint64
-	recordingId, err := strconv.ParseUint(InputJson.RecordingId, 10, 64)
-	if err != nil {
-		log.Printf("Error converting recordingId to uint: %v\n", err)
-		http.Error(w, "Invalid recordingId format", http.StatusBadRequest)
-		return
-	}
+	// recordingId, err := strconv.ParseUint(InputJson.RecordingId, 10, 64)
+	// if err != nil {
+	// 	log.Printf("Error converting recordingId to uint: %v\n", err)
+	// 	http.Error(w, "Invalid recordingId format", http.StatusBadRequest)
+	// 	return
+	// }
 
+	recordingId := InputJson.RecordingId
 	fmt.Printf("recordingId: %d\n", recordingId) // TESTING
 
 	// verify URL contains the required inputs
