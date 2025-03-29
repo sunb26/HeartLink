@@ -9,6 +9,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -138,6 +139,12 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 
 	userIDWav := newFile.Filename
 	userID := strings.Split(strings.Split(userIDWav, "_")[2], ".")[0] // extract userID from filename
+	userIDInt, err := strconv.ParseUint(userID, 10, 64)               // convert userID from string to uint64
+	if err != nil {
+		log.Printf("Error converting userID to uint64: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	// send userID + public firebase recording link to relational database
 	tx, err := env.DB.Beginx() // setup database connection
@@ -148,7 +155,7 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 	defer tx.Rollback()
 
 	var status string = "notSubmitted" // always set to notSubmitted when first uploaded
-	_, err = tx.Exec("INSERT INTO recordings (patient_id, download_url, recording_datetime, status) VALUES ($1, $2, $3, $4)", userID, publicURL, time.Now(), status)
+	_, err = tx.Exec("INSERT INTO recordings (patient_id, download_url, recording_datetime, status) VALUES ($1, $2, $3, $4)", userIDInt, publicURL, time.Now(), status)
 	if err != nil {
 		log.Printf("Error inserting new recording into database: %v\n", err)
 	}
