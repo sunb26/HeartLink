@@ -24,7 +24,7 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		log.Println("invalid http request type - should be GET request - instead is", r.Method)
 	}
 
-	newRecording := []recordingInfo{}
+	newRecording := recordingInfo{}
 
 	// parse query parameter from URL
 	u, err := url.Parse(r.URL.String())
@@ -58,7 +58,7 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 	defer tx.Rollback()
 
 	// select view status and physician comments from database
-	err = tx.Select(&newRecording,
+	err = tx.Get(&newRecording,
 		`SELECT
 		r.status,
 		r.physician_comments,
@@ -78,17 +78,13 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("status: %s\n", newRecording[0].Status)                        // TESTING
-	fmt.Printf("physician comments: %s\n", newRecording[0].PhysicianComments) // TESTING
-	fmt.Printf("recording id: %d\n", newRecording[0].RecordingId)             // TESTING
-	fmt.Printf("download url: %s\n", newRecording[0].DownloadUrl)             // TESTING
-
-	// create JSON response
-	data := make(map[string]interface{})
-	data["recording"] = newRecording
+	fmt.Printf("status: %s\n", newRecording.Status)                        // TESTING
+	fmt.Printf("physician comments: %s\n", newRecording.PhysicianComments) // TESTING
+	fmt.Printf("recording id: %d\n", newRecording.RecordingId)             // TESTING
+	fmt.Printf("download url: %s\n", newRecording.DownloadUrl)             // TESTING
 
 	w.Header().Set("Content-Type", "application/json")
-	if err = json.NewEncoder(w).Encode(data); err != nil {
+	if err = json.NewEncoder(w).Encode(newRecording); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Printf("LoadRecordingInfoApp: Error encoding JSON: %v\n", err)
 		return
