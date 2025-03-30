@@ -51,7 +51,7 @@ func (env *Env) DeleteRecording(w http.ResponseWriter, r *http.Request) {
 	// select recording id and recording date/time from database
 	result, err := tx.Exec("DELETE FROM recordings WHERE recording_id = $1", recordingId)
 	if err != nil {
-		log.Printf("Error fetching status or physician comments from database: %v\n", err)
+		log.Printf("Error fetching data from database: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 

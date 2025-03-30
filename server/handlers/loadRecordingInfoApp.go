@@ -21,6 +21,7 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 
 	// ensure receiving GET request
 	if r.Method != "GET" {
+		http.Error(w, "Invalid http request type", http.StatusBadRequest)
 		log.Println("invalid http request type - should be GET request - instead is", r.Method)
 	}
 
@@ -68,7 +69,7 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		recordings r
 	WHERE recording_id = $1`, recordingId)
 	if err != nil {
-		log.Printf("Error fetching status or physician comments from database: %v\n", err)
+		log.Printf("Error fetching data from database: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
