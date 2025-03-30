@@ -9,16 +9,23 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/rs/cors"
 )
 
 func logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-		// Set headers for CORS
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, application/json")
+		// // Set headers for CORS
+		// w.Header().Set("Access-Control-Allow-Origin", "*")
+		// w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
+		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, application/json")
+
+		// // Handle preflight (OPTIONS) requests early
+		// if r.Method == "OPTIONS" {
+		// 	w.WriteHeader(http.StatusOK)
+		// 	return
+		// }
 
 		next.ServeHTTP(w, r)
 		log.Printf("%s %s %s\n", r.Method, r.URL.Path, time.Since(start))
@@ -51,6 +58,8 @@ func main() {
 
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
+	corsMiddleware := cors.Default().Handler(mux)
+
 	// each HandleFunc is used to handle a specific endpoint
 	mux.HandleFunc("/UploadFilterRecording", env.UploadFilterRecording)
 	mux.HandleFunc("/CreatePhysician", env.CreatePhysician)
@@ -63,5 +72,5 @@ func main() {
 	mux.HandleFunc("/DeleteRecording", env.DeleteRecording)
 
 	log.Println("Server listening on port 8080...")
-	log.Fatal(http.ListenAndServe(":8080", logging(mux)))
+	log.Fatal(http.ListenAndServe(":8080", logging(corsMiddleware)))
 }
