@@ -50,7 +50,7 @@ func (env *Env) ListPatients(w http.ResponseWriter, r *http.Request) {
     p.firstname,
     p.lastname,
     p.email,
-    p.last_updated,
+    TO_CHAR(p.last_updated AT TIME ZONE 'EST', 'DD/MM/YYYY HH24:MI:SS') AS last_updated,
     CASE WHEN al.patient_id IS NOT NULL THEN true ELSE false END AS verified,
     CASE WHEN COUNT(r.recording_id) FILTER (WHERE r.status != 'viewed') = 0 THEN true ELSE false END AS viewed
 	FROM 
