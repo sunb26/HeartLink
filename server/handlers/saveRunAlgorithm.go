@@ -176,7 +176,7 @@ func readWAV(filename string) ([]float64, uint32, error) {
 }
 
 func detectBeats(samples []float64, sampleRate uint32) float64 {
-	threshold := 0.40 //determined based on examining matlab amplitude plots
+	threshold := 0.30 //determined based on examining matlab amplitude plots
 	lastPeak := -1
 	beatCount := 0
 
