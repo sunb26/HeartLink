@@ -22,6 +22,7 @@ type Recording struct {
 	RecordingId       int    `db:"recording_id" json:"recordingId"`
 	RecordingDateTime string `db:"recording_datetime" json:"recordingDateTime"`
 	DownloadUrl       string `db:"download_url" json:"downloadUrl"`
+	Comments          string `db:"comments" json:"comments"`
 }
 
 func (env *Env) GetPatient(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +63,7 @@ func (env *Env) GetPatient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = tx.Select(&recordings, "SELECT recording_id, TO_CHAR(recording_datetime AT TIME ZONE 'EST', 'DD/MM/YYYY HH24:MI:SS') AS recording_datetime, download_url FROM recordings WHERE patient_id = $1 ORDER BY (recording_datetime) DESC", patientId)
+	err = tx.Select(&recordings, "SELECT recording_id, TO_CHAR(recording_datetime AT TIME ZONE 'EST', 'DD/MM/YYYY HH24:MI:SS') AS recording_datetime, download_url, physician_comments AS comments FROM recordings WHERE patient_id = $1 ORDER BY (recording_datetime) DESC", patientId)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Printf("getPatient: %v\n", err)
