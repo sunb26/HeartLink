@@ -13,6 +13,7 @@ func (env *Env) DeleteRecording(w http.ResponseWriter, r *http.Request) {
 
 	// ensure receiving DELETE request
 	if r.Method != "DELETE" {
+		http.Error(w, "Invalid http request type", http.StatusBadRequest)
 		log.Println("invalid http request type - should be DELETE request - instead is", r.Method)
 	}
 
@@ -67,7 +68,7 @@ func (env *Env) DeleteRecording(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if rowsAffected == 0 {
-		http.Error(w, "No rows affected", http.StatusInternalServerError)
+		http.Error(w, "No rows affected", http.StatusNotFound)
 		return
 	}
 
