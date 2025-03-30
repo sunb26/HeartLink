@@ -22,6 +22,7 @@ func (env *Env) CreatePatient(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&p)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		log.Printf("createPatient: %v\n", err)
 		return
 	}
 
@@ -29,21 +30,23 @@ func (env *Env) CreatePatient(w http.ResponseWriter, r *http.Request) {
 	tx, err := env.DB.Beginx()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-
 		return
 	}
 
 	_, err = tx.Exec("INSERT INTO patient (physician_id, firstname, lastname, email, height, weight, dob, sex, last_updated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()) ON CONFLICT (patient_id) DO UPDATE SET firstname = $2, lastname = $3, email = $4, height = $5, weight = $6, dob = $7, sex = $8, last_updated = NOW()", p.PhysicianId, p.FirstName, p.LastName, p.Email, p.Height, p.Weight, p.Dob, p.Sex)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("createPatient: %v\n", err)
 		return
 	}
 
 	err = tx.Commit()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		log.Printf("createPatient: %v\n", err)
 		return
 	}
 
+	w.WriteHeader(http.StatusCreated)
 	log.Printf("createPatient Response: %v\n", p)
 }
