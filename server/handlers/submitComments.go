@@ -26,7 +26,7 @@ func (env *Env) SubmitComments(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = tx.Exec("UPDATE recordings SET physician_comments = $2 WHERE recording_id = $1", c.RecordingId, c.Comments)
+	_, err = tx.Exec("UPDATE recordings SET physician_comments = $2, status = 'viewed' WHERE recording_id = $1", c.RecordingId, c.Comments)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
