@@ -10,6 +10,7 @@ import SwiftUI
 struct LoginView: View {
     @Binding var path: [PageActions]
     @Binding var patient: User
+    @Binding var isLoggedIn: Bool
     @State private var userId: String = ""
     @State private var password: String = ""
     @State private var isLoading: Bool = false
@@ -87,6 +88,7 @@ struct LoginView: View {
         do {
             patient = try await getUser(username: userId, password: password)
             isLoading = false
+            isLoggedIn = true
             path.removeLast(path.count)
         } catch LoginError.invalidURL {
             print("LoginError: invalid URL")
@@ -116,6 +118,7 @@ struct ResetPasswordView: View {
 #Preview {
     @Previewable @State var path: [PageActions] = [.login]
     @Previewable @State var patient: User = User(patientId: 1)
+    @Previewable @State var loggedIn: Bool = false
 
-    LoginView(path: $path, patient: $patient)
+    LoginView(path: $path, patient: $patient, isLoggedIn: $loggedIn)
 }

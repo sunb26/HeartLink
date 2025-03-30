@@ -9,6 +9,7 @@ import SwiftUI
 
 struct HomeView: View {
     @Binding var path: [PageActions]
+    @Binding var isLoggedIn: Bool
     @Binding var patient: User
     @Binding var recordingData: RecordingData
     @State var btPopUp: Bool = false
@@ -105,10 +106,13 @@ struct HomeView: View {
         }
         .preferredColorScheme(.light)
         .onAppear(perform: listRecordings)
+        .onChange(of: isLoggedIn) {
+            listRecordings()
+        }
     }
 
     func listRecordings() {
-        guard let url = URL(string: "https://heartlink2.free.beeceptor.com/listRecordings") else {
+        guard let url = URL(string: "https://heartlink-652851748566.northamerica-northeast2.run.app/ListRecordingsApp?patientid=\(patient.patientId)") else {
             print("invalid URL")
             return
         }
