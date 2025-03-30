@@ -44,7 +44,7 @@ export default async function PatientPage({params}: {params: Promise<{ id: strin
             <br />
             Weight: {patient.weight} lbs
             <br />
-            Height: {patient.height} m
+            Height: {patient.height} cm
           </p>
         </div>
       </div>

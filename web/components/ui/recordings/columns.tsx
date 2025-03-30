@@ -15,6 +15,7 @@ export type Recording = {
   recordingId: number;
   recordingDateTime: string;
   downloadUrl: string;
+  comments: string;
 };
 
 export const columns: ColumnDef<Recording>[] = [
@@ -49,6 +50,9 @@ export const columns: ColumnDef<Recording>[] = [
                   Your browser does not support the audio element.
                 </audio>
               </div>
+              <div className="grid w-full gap-4">
+                {row.original.comments}
+                </div>
               <div className="grid w-full gap-4">
                 <CommentForm recordingId={row.original.recordingId} />
               </div>
