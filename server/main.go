@@ -15,21 +15,8 @@ import (
 func logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
-
-		// // Set headers for CORS
-		// w.Header().Set("Access-Control-Allow-Origin", "*")
-		// w.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS")
-		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, application/json")
-
-		// // Handle preflight (OPTIONS) requests early
-		// if r.Method == "OPTIONS" {
-		// 	w.WriteHeader(http.StatusOK)
-		// 	return
-		// }
-
 		next.ServeHTTP(w, r)
 		log.Printf("%s %s %s\n", r.Method, r.URL.Path, time.Since(start))
-
 	})
 }
 
@@ -58,6 +45,7 @@ func main() {
 
 	mux := http.NewServeMux() // create custom multiplexer to handle incoming requests
 
+	// CORS middleware
 	corsMiddleware := cors.Default().Handler(mux)
 
 	// each HandleFunc is used to handle a specific endpoint
