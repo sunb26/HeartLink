@@ -55,9 +55,9 @@ func (env *Env) ListPatients(w http.ResponseWriter, r *http.Request) {
     CASE WHEN COUNT(r.recording_id) FILTER (WHERE r.status != 'viewed') = 0 THEN true ELSE false END AS viewed
 	FROM 
 			patient p
-	INNER JOIN 
+	LEFT JOIN 
 			app_login al ON p.patient_id = al.patient_id
-	INNER JOIN 
+	LEFT JOIN 
 			recordings r ON p.patient_id = r.patient_id
 	WHERE physician_id = $1
 	GROUP BY p.patient_id, al.patient_id
