@@ -8,6 +8,8 @@ require firebase.google.com/go v3.13.0+incompatible
 
 require github.com/jmoiron/sqlx v1.4.0
 
+require github.com/rs/cors v1.11.1 // indirect
+
 require (
 	cel.dev/expr v0.16.1 // indirect
 	cloud.google.com/go v0.117.0 // indirect
