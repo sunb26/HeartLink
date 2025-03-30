@@ -63,6 +63,7 @@ func main() {
 	mux.HandleFunc("/DeleteRecording", env.DeleteRecording)
 	mux.HandleFunc("/ListRecordingsApp", env.ListRecordingsApp)
 	mux.HandleFunc("/PatientLoginApp", env.PatientLoginApp)
+	mux.HandleFunc("/DeletePatient", env.DeletePatient)
 
 	log.Println("Server listening on port 8080...")
 	log.Fatal(http.ListenAndServe(":8080", logging(corsMiddleware)))
