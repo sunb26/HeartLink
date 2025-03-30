@@ -99,7 +99,7 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 
 	// create JSON response
 	data := make(map[string]interface{})
-	data["recordings"] = newRecording
+	data["widgets"] = newRecording
 
 	w.Header().Set("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(data); err != nil {
