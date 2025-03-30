@@ -2,20 +2,29 @@
 
 const char *ssid = NULL;
 const char *password = NULL;
+const char *patientID = NULL;
 String startStop = "stop";
+
+//char filename[64] = "/heartlink_0.wav";
+char filename[64];
 
 void ServerConnectionCallbacks::onConnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo) {
     Serial.println("BLUETOOTH CONNECTED");
+    //digitalWrite(BLUE_LED_PIN, HIGH);
+    analogWrite(BLUE_LED_PIN, 100);
+
 }
 
 void ServerConnectionCallbacks::onDisconnect(NimBLEServer* pServer, NimBLEConnInfo& connInfo, int reason) {
     Serial.println("BLUETOOTH DISCONNECTED");
     NimBLEDevice::startAdvertising();
+    analogWrite(BLUE_LED_PIN, 0);
+    initializeWifi();
 }
 
 void WifiCallbacks::onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo& connInfo) {
     String value = pCharacteristic->getValue();
-    Serial.println(value);
+    // Serial.println(value);
     // TODO: implement code to connect to WiFi
     
     int delimiterIndex = value.indexOf('&');
@@ -32,15 +41,23 @@ void WifiCallbacks::onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInf
     ssid = parsedSSID;
     password = parsedPassword;
 
-    Serial.println(ssid);
-    Serial.println(password);
-
 }
 
 void RecordingCallbacks::onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo& connInfo) {
     startStop = pCharacteristic->getValue();
-    Serial.println("Recording");
     Serial.println(startStop);
+}
 
-    // TODO: implement code to trigger recording on the device
+void PatientInfoCallbacks::onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo& connInfo) {
+    String value = pCharacteristic->getValue();
+    Serial.println("Patient Id:");
+    Serial.println(value);  
+
+    
+    snprintf(filename, sizeof(filename), "/heartlink_%s.wav", value.c_str());
+    Serial.print("Filename: ");
+    Serial.println(filename);
+}
+
+void UploadCallbacks::onWrite(NimBLECharacteristic *pCharacteristic, NimBLEConnInfo& connInfo) {
 }
