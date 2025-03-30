@@ -15,6 +15,9 @@ import (
 func logging(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
+		w.Header().Add("Access-Control-Allow-Origin", "*")
+		w.Header().Add("Access-Control-Allow-Methods", "POST, OPTIONS, GET, DELETE, PUT")
+		w.Header().Add("Access-Control-Allow-Headers", "content-type")
 		next.ServeHTTP(w, r)
 		log.Printf("%s %s %s\n", r.Method, r.URL.Path, time.Since(start))
 	})
