@@ -64,7 +64,8 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 		r.recording_datetime
 	FROM
 		recordings r
-	WHERE patient_id = $1`, patientId)
+	WHERE patient_id = $1
+	ORDER BY r.recording_id DESC`, patientId)
 	if err != nil {
 		log.Printf("Error fetching data from database: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
