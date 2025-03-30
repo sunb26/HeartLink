@@ -17,7 +17,7 @@ enum PageActions: Hashable {
 struct MainNavView: View {
     @State var path: [PageActions] = [.login]
     @StateObject var btmanager = BluetoothManager()
-    @State var patient: User = User(email: "", patientId: 0, physicianId: 0)
+    @State var patient: User = User(patientId: 0)
     @State var recordingData: RecordingData = RecordingData(recordingId: 0, status: "notSubmitted", physicianComments: "", downloadUrl: "")
 
     var body: some View {

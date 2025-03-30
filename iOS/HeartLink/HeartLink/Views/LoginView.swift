@@ -52,7 +52,7 @@ struct LoginView: View {
                     Button(action: {
                         loginFailed = false
                         if userId.isEmpty || password.isEmpty {
-                            print("Please enter a username and password")
+                            loginFailed = true
                         } else {
                             Task {
                                 await performLogin()
@@ -85,7 +85,7 @@ struct LoginView: View {
         isLoading = true
 
         do {
-            patient = try await getUser()
+            patient = try await getUser(username: userId, password: password)
             isLoading = false
             path.removeLast(path.count)
         } catch LoginError.invalidURL {
@@ -115,7 +115,7 @@ struct ResetPasswordView: View {
 
 #Preview {
     @Previewable @State var path: [PageActions] = [.login]
-    @Previewable @State var patient: User = User(email: "test", patientId: 1, physicianId: 1)
+    @Previewable @State var patient: User = User(patientId: 1)
 
     LoginView(path: $path, patient: $patient)
 }

@@ -7,8 +7,8 @@
 
 import Foundation
 
-func getUser() async throws -> User {
-    guard let url = URL(string: "https://heartlink.free.beeceptor.com/test") else {
+func getUser(username: String, password: String) async throws -> User {
+    guard let url = URL(string: "https://heartlink-652851748566.northamerica-northeast2.run.app/PatientLoginApp?username=\(username)&password=\(password)") else {
         throw LoginError.invalidURL
     }
 

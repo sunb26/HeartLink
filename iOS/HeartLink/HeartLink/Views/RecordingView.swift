@@ -149,6 +149,6 @@ struct RecordingView: View {
 
 #Preview {
     @Previewable var bt = BluetoothManager()
-    @Previewable @State var patient: User = User(email: "test", patientId: 1, physicianId: 1)
+    @Previewable @State var patient: User = User(patientId: 1)
     RecordingView(bluetoothManager: bt, patient: $patient)
 }
