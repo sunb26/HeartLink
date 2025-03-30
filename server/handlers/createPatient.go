@@ -45,6 +45,5 @@ func (env *Env) CreatePatient(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	log.Printf("createPatient Response: %v\n", p)
 }
