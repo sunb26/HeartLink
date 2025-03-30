@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -15,6 +14,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+
+type reqBody = {
+  physicianId: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  dob: string,
+  sex: string,
+  height: number,
+  weight: number,
+}
+
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -31,7 +42,7 @@ const formSchema = z.object({
     invalid_type_error: "Invalid date format",
   }),
   sex: z.enum(["M", "F", "NB", ""], {
-    message: "Please enter 'M', 'F', or 'NB'.",
+    message: "Please enter capital 'M', 'F', or 'NB'.",
   }),
   height: z.coerce.number().min(0, {
     message: "Please enter a valid height.",
@@ -41,8 +52,7 @@ const formSchema = z.object({
   }),
 });
 
-export function RegisterPatientForm() {
-  // 1. Define your form.
+export function RegisterPatientForm( { physicianId }: { physicianId?: string }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -57,17 +67,39 @@ export function RegisterPatientForm() {
   const [submitted, setSubmitted] = useState(false);
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    if (physicianId == null) {
+      form.setError("weight", {
+        type: "weight",
+        message: "Physician ID not found",
+      });
+      return;
+    }
+    const rb : reqBody = {
+      physicianId: physicianId,
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      sex: values.sex,
+      dob: values.dob.toISOString(),
+      height: values.height,
+      weight: values.weight,
+    };
     const reqOptions = {
       method: "POST",
-      headers: { 'Access-Control-Allow-Headers': 'Content-Type'},
-      body: JSON.stringify(values),
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(rb),
     };
     fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/CreatePatient`, reqOptions).then(
       (res) => {
         if (res.ok) {
           setSubmitted(true);
+          console.log("Patient created successfully");
         } else {
-          form.setError("root", {
+          console.log("Error creating patient");
+          console.log(res);
+          form.setError("weight", {
             type: "server",
             message: "Something went wrong. Please try again.",
           });
@@ -147,7 +179,7 @@ export function RegisterPatientForm() {
             <FormItem>
               <FormLabel>Sex</FormLabel>
               <FormControl>
-                <Input placeholder="M or F or NB" {...field.value.toUpperCase} />
+                <Input placeholder="M or F or NB" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

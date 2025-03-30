@@ -18,7 +18,7 @@ export default async function PhysicianPage() {
   }
   const body = await response.json();
   const data = body.patients;
-
+  console.log("Root PhysicianId:", physician?.id);
   return (
     <div>
       <div className="bg-off-white">
@@ -28,7 +28,7 @@ export default async function PhysicianPage() {
       </div>
       <div className="container mx-auto py-10">
         <h2 className="text-2xl font-bold pb-4 font-[Syne]">Your Patients</h2>
-        <DataTable columns={columns} data={data} />
+        <DataTable columns={columns} data={data} physicianId={physician?.id}/>
       </div>
     </div>
   );

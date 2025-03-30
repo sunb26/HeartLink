@@ -44,7 +44,8 @@ interface DataTableProps<TData, TValue> {
 export function DataTable<TData extends { patientId: number }, TValue>({
   columns,
   data,
-}: DataTableProps<TData, TValue>) {
+  physicianId,
+}: DataTableProps<TData, TValue> & { physicianId?: string }) {
   const router = useRouter();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState("");
@@ -92,7 +93,7 @@ export function DataTable<TData extends { patientId: number }, TValue>({
                 </DialogDescription>
               </DialogHeader>
               <div>
-                <RegisterPatientForm />
+                <RegisterPatientForm physicianId={ physicianId }/>
               </div>
             </DialogContent>
           </Dialog>
