@@ -48,6 +48,7 @@ export function CommentForm( { recordingId }: { recordingId: number }) {
       (res) => {
         if (res.ok) {
           setSubmitted(true);
+          window.location.reload();
         } else {
           form.setError("comments", {
             type: "server",

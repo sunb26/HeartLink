@@ -161,7 +161,14 @@ export const columns: ColumnDef<Patient>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               // TODO: do a fetch to a DELETE endpoint
-              onClick={() => navigator.clipboard.writeText(`${patient.patientId}`)}
+              onClick={() =>     
+                fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/DeletePatient?patientid=${row.original.patientId}`, {
+                  method: "GET",
+                  headers: {
+                    "Content-Type": "application/json",
+                  }}).then(() => {
+                    window.location.reload();
+              })}
               className="text-red-500 font-bold"
             >
               DELETE
