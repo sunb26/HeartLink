@@ -43,17 +43,17 @@ export const columns: ColumnDef<Recording>[] = [
           </DialogTrigger>
           <DialogTitle>
             <DialogContent className="max-w-[425px] pt-10">
-              <div className="bg-slate-400 p-8 rounded-lg max-w-full">
+              <div className="bg-slate-400 p-8 rounded-lg max-w-[400px]">
                 {/* biome-ignore lint/a11y/useMediaCaption: heart sounds don't require CC */}
                 <audio controls>
                   <source src={row.original.downloadUrl} type="audio/wav" />
                   Your browser does not support the audio element.
                 </audio>
               </div>
-              <div className="grid w-full text-wrap max-w-full">
+              <div className="grid w-full gap-4 text-wrap max-w-[400px]">
                 <p>{row.original.comments}</p>
                 </div>
-              <div className="grid w-full gap-4 max-w-full">
+              <div className="grid w-full gap-4 max-w-[400px]">
                 <CommentForm recordingId={row.original.recordingId} />
               </div>
             </DialogContent>
