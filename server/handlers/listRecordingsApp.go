@@ -20,6 +20,7 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 
 	// ensure receiving GET request
 	if r.Method != "GET" {
+		http.Error(w, "Invalid http request type", http.StatusBadRequest)
 		log.Println("invalid http request type - should be GET request - instead is", r.Method)
 	}
 
@@ -65,7 +66,7 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 		recordings r
 	WHERE patient_id = $1`, patientId)
 	if err != nil {
-		log.Printf("Error fetching status or physician comments from database: %v\n", err)
+		log.Printf("Error fetching data from database: %v\n", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -78,6 +79,13 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 	var parsedTime time.Time
 	var parsedTimeLocal time.Time
 
+	location, err := time.LoadLocation("America/New_York") // set time zone to EST
+	if err != nil {
+		log.Printf("Error loading location: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	// update recordingDateTime format
 	for j := range newRecording {
 		parsedTime, err = time.Parse(time.RFC3339, newRecording[j].RecordingDateTime) // convert to time.Time general format
@@ -87,7 +95,7 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		parsedTimeLocal = parsedTime.Local()                                              // convert to current time zone
+		parsedTimeLocal = parsedTime.In(location)                                         // convert to EST time zone
 		newRecording[j].RecordingDateTime = parsedTimeLocal.Format("2006-01-02 15:04:05") // format to YYYY-MM-DD HH:MM:SS
 	}
 
