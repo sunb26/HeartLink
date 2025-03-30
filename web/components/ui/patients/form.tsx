@@ -14,6 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useState } from "react";
 
 const formSchema = z.object({
   firstName: z.string().min(2, {
@@ -53,10 +54,26 @@ export function RegisterPatientForm() {
       weight: 0,
     },
   });
+  const [submitted, setSubmitted] = useState(false);
 
-  // 2. TODO (sunb26): Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const reqOptions = {
+      method: "POST",
+      headers: { 'Access-Control-Allow-Headers': 'Content-Type'},
+      body: JSON.stringify(values),
+    };
+    fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/CreatePatient`, reqOptions).then(
+      (res) => {
+        if (res.ok) {
+          setSubmitted(true);
+        } else {
+          form.setError("root", {
+            type: "server",
+            message: "Something went wrong. Please try again.",
+          });
+        }
+      }
+    );
   }
 
   return (
@@ -164,6 +181,11 @@ export function RegisterPatientForm() {
         />
         <Button type="submit">Confirm Registration</Button>
       </form>
+      {submitted && (
+          <FormMessage className="text-green-900 font-bold">
+            Patient created successfully.
+          </FormMessage>
+        )}
     </Form>
   );
 }
