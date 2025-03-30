@@ -51,7 +51,9 @@ export const columns: ColumnDef<Recording>[] = [
                 </audio>
               </div>
               <div className="grid w-full gap-4 text-wrap max-w-[375px]">
-                <p>{row.original.comments}</p>
+                <p className="text-wrap max-w-[375px]">
+                  {row.original.comments}
+                  </p>
                 </div>
               <div className="grid w-full gap-4 max-w-[375px]">
                 <CommentForm recordingId={row.original.recordingId} />
