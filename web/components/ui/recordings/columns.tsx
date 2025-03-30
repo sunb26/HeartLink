@@ -50,7 +50,7 @@ export const columns: ColumnDef<Recording>[] = [
                   Your browser does not support the audio element.
                 </audio>
               </div>
-              <div className="grid w-full p-8 text-wrap max-w-full">
+              <div className="grid w-full text-wrap max-w-full">
                 <p>{row.original.comments}</p>
                 </div>
               <div className="grid w-full gap-4 max-w-full">
