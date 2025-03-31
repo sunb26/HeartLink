@@ -10,7 +10,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -152,17 +151,8 @@ export const columns: ColumnDef<Patient>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
-              // TODO: do a fetch to a UPDATE endpoint
-              onClick={() => navigator.clipboard.writeText(`${patient.patientId}`)}
-              className="font-bold"
-            >
-              EDIT
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              // TODO: do a fetch to a DELETE endpoint
               onClick={() =>     
-                fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/DeletePatient?patientid=${row.original.patientId}`, {
+                fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/DeletePatient?patientid=${patient.patientId}`, {
                   method: "GET",
                   headers: {
                     "Content-Type": "application/json",
