@@ -16,6 +16,7 @@ export type Recording = {
   recordingDateTime: string;
   downloadUrl: string;
   comments: string;
+  heartRate: number;
 };
 
 export const columns: ColumnDef<Recording>[] = [
@@ -51,6 +52,8 @@ export const columns: ColumnDef<Recording>[] = [
                 </audio>
               </div>
               <div className="grid w-full gap-4 text-wrap max-w-[375px]">
+                <h1 className="font-bold">Heart Rate (BPM): {row.original.heartRate}</h1>
+                <h2 className="font-bold">Previous Comments Submission:</h2>
                 <p className="text-wrap max-w-[375px]">
                   {row.original.comments}
                   </p>
