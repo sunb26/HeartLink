@@ -122,6 +122,7 @@ table "recordings" {
     null    = true
     type    = integer
     comment = "Heart Rate calculated via the algorithm."
+    default = 0
   }
   column "physician_comments" {
     null    = true
