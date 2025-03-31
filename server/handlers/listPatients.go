@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 type patient struct {
@@ -50,7 +51,7 @@ func (env *Env) ListPatients(w http.ResponseWriter, r *http.Request) {
     p.firstname,
     p.lastname,
     p.email,
-    TO_CHAR(p.last_updated AT TIME ZONE 'EST', 'DD/MM/YYYY HH24:MI:SS') AS last_updated,
+    p.last_updated,
     CASE WHEN al.patient_id IS NOT NULL THEN true ELSE false END AS verified,
     CASE WHEN COUNT(r.recording_id) FILTER (WHERE r.status != 'viewed') = 0 THEN true ELSE false END AS viewed
 	FROM 
@@ -66,6 +67,29 @@ func (env *Env) ListPatients(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Printf("listPatients: %v\n", err)
 		return
+	}
+
+	var parsedTime time.Time
+	var parsedTimeLocal time.Time
+
+	location, err := time.LoadLocation("America/New_York") // set time zone to EST
+	if err != nil {
+		log.Printf("Error loading location: %v\n", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// update recordingDateTime format
+	for j := range patients {
+		parsedTime, err = time.Parse(time.RFC3339, patients[j].LastUpdated) // convert to time.Time general format
+		if err != nil {
+			log.Printf("Error parsing date/time: %v\n", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		parsedTimeLocal = parsedTime.In(location)                               // convert to EST time zone
+		patients[j].LastUpdated = parsedTimeLocal.Format("2006-01-02 15:04:05") // format to YYYY-MM-DD HH:MM:SS
 	}
 
 	err = tx.Commit()
