@@ -8,7 +8,7 @@
 import Foundation
 
 func getRecording(recordingId: UInt64) async throws -> RecordingData {
-    guard let url = URL(string: "https://heartlink.free.beeceptor.com/getRecording") else {
+    guard let url = URL(string: "https://heartlink-652851748566.northamerica-northeast2.run.app/LoadRecordingInfoApp?recordingid=\(recordingId)") else {
         throw RecordingError.invalidURL
     }
 
@@ -66,7 +66,7 @@ func submit(submission: RecordingSubmission) async throws {
 }
 
 func delete(recordingId: UInt64) async throws {
-    guard let url = URL(string: "https://heartlink.free.beeceptor.com/recording/delete/\(recordingId)") else {
+    guard let url = URL(string: "https://heartlink-652851748566.northamerica-northeast2.run.app/DeleteRecording?recordingid=\(recordingId)") else {
         print("delete recording: invalid URL")
         return
     }
