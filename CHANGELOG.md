@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 2.0.0 (2025-03-29)
+- complete all endpoints
+- add app icon
+
 ## 1.18.1 (2025-03-24)
 - update endpoint to pass raw audio file into python DSP algorithm and save filtered file to Firebase 
 
