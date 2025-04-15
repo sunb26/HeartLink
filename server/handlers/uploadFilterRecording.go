@@ -23,7 +23,7 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 		log.Println("invalid http request type - should be POST request - instead is", r.Method)
 	}
 
-	fmt.Fprint(w, "UploadFilterRecording Endpoint - Start\n") // Arduino expects response when sends POST request
+	fmt.Fprint(w, "Starting File Upload...\n") // Arduino expects response when sends POST request
 
 	// set 1 MB max on input file size
 	err := r.ParseMultipartForm(32 << 15)
@@ -130,9 +130,6 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 				log.Printf("Error uploading WAV file to Firebase Storage: %v\n", err)
 			}
 
-			fmt.Printf("Successfully uploaded file to Firebase Storage at: %s\n", publicURL) // TESTING
-			fmt.Println()
-
 		}
 
 	}
@@ -167,18 +164,4 @@ func (env *Env) UploadFilterRecording(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// w.WriteHeader(http.StatusOK)
-
-	// populate data to send back to client - not sure if needed/following this convention
-	// data := make(map[string]interface{})
-	// data["form_field_value"] = newFile.Filename
-	// data["status"] = 200
-
-	// send data back to the client
-	// if err = json.NewEncoder(w).Encode(data); err != nil {
-	// 	log.Printf("Error encoding JSON: %v\n", err)
-	// 	return
-	// }
-
-	fmt.Fprint(w, "UploadFilterRecording Endpoint - End\n") // TESTING
 }

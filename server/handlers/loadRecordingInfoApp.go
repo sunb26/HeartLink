@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -16,8 +15,6 @@ type recordingInfo struct {
 }
 
 func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Print("LoadRecordingInfoApp Endpoint - Start\n")
 
 	// ensure receiving GET request
 	if r.Method != "GET" {
@@ -78,11 +75,6 @@ func (env *Env) LoadRecordingInfoApp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Printf("status: %s\n", newRecording.Status)                        // TESTING
-	fmt.Printf("physician comments: %s\n", newRecording.PhysicianComments) // TESTING
-	fmt.Printf("recording id: %d\n", newRecording.RecordingId)             // TESTING
-	fmt.Printf("download url: %s\n", newRecording.DownloadUrl)             // TESTING
 
 	w.Header().Set("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(newRecording); err != nil {

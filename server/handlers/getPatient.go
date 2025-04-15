@@ -51,6 +51,7 @@ func (env *Env) GetPatient(w http.ResponseWriter, r *http.Request) {
 
 	recordings := []Recording{}
 	p := PatientPage{}
+
 	// Begin a database transaction
 	tx, err := env.DB.Beginx()
 	if err != nil {

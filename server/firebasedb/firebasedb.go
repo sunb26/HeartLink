@@ -22,13 +22,10 @@ type FireDB struct {
 var fireDB FireDB
 var bucket *storage.BucketHandle
 
-// UploadWAVToFirebase function
 func (db *FireDB) UploadWAVToFirebase(fileContent io.ReadCloser, storagePath string) (string, error) {
 
 	ctx := context.Background()
 	key := uuid.New() // generate key to act as access token in firebase storage
-
-	fmt.Println("key value (in firebasedb.go):", key.String()) // TESTING
 
 	object := bucket.Object(storagePath)
 
@@ -107,45 +104,7 @@ func (db *FireDB) DownloadWAVFromFirebase(firebaseURL string, localFilePath stri
 
 }
 
-// TEST function (will use in other endpoints)
-/*
-func (db *FireDB) GetAllFilesFirebase() error {
-
-	directory := "recordings/" // hard coded (based on Firebase Storage structure)
-
-	ctx := context.Background()
-
-	query := &storage.Query{
-		Prefix:    directory,
-		Delimiter: "/",
-	}
-
-	var files []string
-	it := bucket.Objects(ctx, query)
-	for {
-		attrs, err := it.Next()
-		if err == iterator.Done {
-			break
-		}
-		if err != nil {
-			fmt.Printf("Error iterating through bucket: %v", err)
-			return nil
-		}
-		files = append(files, attrs.Name)
-	}
-
-	fmt.Printf(`{"files": %q`, files)
-	fmt.Println()
-
-	return nil
-
-}
-*/
-
-// connect to firebase database
 func (db *FireDB) Connect() error {
-
-	fmt.Printf("Connecting to Firebase Storage\n") // TESTING
 
 	ctx := context.Background()
 
@@ -202,8 +161,6 @@ func (db *FireDB) Connect() error {
 	if err != nil {
 		log.Fatalf("Failed to get bucket attributes - error message: %v\n", err)
 	}
-
-	fmt.Printf("Successfully connected to Firebase Storage\n") // TESTING
 
 	return nil
 

@@ -1,15 +1,12 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 )
 
 func (env *Env) DeletePatient(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Print("DeletePatient Endpoint - Start\n") // TESTING
 
 	// ensure receiving DELETE request
 	if r.Method != "DELETE" {

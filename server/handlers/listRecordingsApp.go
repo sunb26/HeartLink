@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,8 +14,6 @@ type recordingList struct {
 }
 
 func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Print("ListRecordingsApp Endpoint - Start\n")
 
 	// ensure receiving GET request
 	if r.Method != "GET" {
@@ -98,12 +95,6 @@ func (env *Env) ListRecordingsApp(w http.ResponseWriter, r *http.Request) {
 
 		parsedTimeLocal = parsedTime.In(location)                                         // convert to EST time zone
 		newRecording[j].RecordingDateTime = parsedTimeLocal.Format("2006-01-02 15:04:05") // format to YYYY-MM-DD HH:MM:SS
-	}
-
-	// TESTING
-	for i := 0; i < len(newRecording); i++ {
-		fmt.Printf("recording id: %d\n", newRecording[i].RecordingId)
-		fmt.Printf("date/time: %s\n", newRecording[i].RecordingDateTime)
 	}
 
 	// create JSON response

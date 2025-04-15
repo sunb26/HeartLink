@@ -1,15 +1,12 @@
 package handlers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
 )
 
 func (env *Env) DeleteRecording(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Print("DeleteRecording Endpoint - Start\n") // TESTING
 
 	// ensure receiving DELETE request
 	if r.Method != "DELETE" {
@@ -48,7 +45,7 @@ func (env *Env) DeleteRecording(w http.ResponseWriter, r *http.Request) {
 	}
 	defer tx.Rollback()
 
-	// select recording id and recording date/time from database
+	// delete record based on recording id from database
 	result, err := tx.Exec("DELETE FROM recordings WHERE recording_id = $1", recordingId)
 	if err != nil {
 		log.Printf("Error fetching data from database: %v\n", err)

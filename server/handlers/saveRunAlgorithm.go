@@ -38,8 +38,6 @@ type WAVHeader struct {
 
 func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 
-	fmt.Print("SaveRunAlgorithm Endpoint - Start\n") // TESTING
-
 	var InputJson inputJson
 	NewRecording := recordingAlgo{}
 
@@ -64,7 +62,6 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 	}
 
 	recordingId := InputJson.RecordingId
-	fmt.Printf("recordingId: %d\n", recordingId) // TESTING
 
 	// verify URL contains the required inputs
 	if recordingId == 0 {
@@ -92,9 +89,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	fmt.Printf("download_url: %s\n", NewRecording.DownloadUrl) // TESTING
-
-	// CODE FOR GETTING IN WAV FROM FIREBASE
+	// get .wav file from Firebase storage
 	localFilename := strconv.FormatUint(recordingId, 10) + ".wav"
 	err = firebasedb.FirebaseDB().DownloadWAVFromFirebase(NewRecording.DownloadUrl, localFilename)
 	if err != nil {
@@ -109,7 +104,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	samples = movingAverage(samples, 5) // 10 is the sample window
+	samples = movingAverage(samples, 5)
 
 	// data to upload to relational database
 	bpm := detectBeats(samples, sampleRate)
@@ -117,7 +112,7 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		bpm = 66
 		fmt.Printf("N/A")
 	} else {
-		fmt.Printf("Estimated Smoothing BPM: %.2f\n", bpm) // TESTING
+		fmt.Printf("Estimated Smoothing BPM: %.2f\n", bpm)
 	}
 
 	// delete local file after algorithm has completed
@@ -141,8 +136,6 @@ func (env *Env) SaveRunAlgorithm(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	// w.WriteHeader(http.StatusOK)
 
 }
 

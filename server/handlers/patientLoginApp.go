@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/url"
@@ -13,8 +12,6 @@ type patientLogin struct {
 }
 
 func (env *Env) PatientLoginApp(w http.ResponseWriter, r *http.Request) {
-
-	fmt.Print("PatientLoginApp Endpoint - Start\n") // TESTING
 
 	// ensure receiving GET request
 	if r.Method != "GET" {
@@ -68,8 +65,6 @@ func (env *Env) PatientLoginApp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	fmt.Printf("patient id: %d\n", patient.PatientId) // TESTING
 
 	w.Header().Set("Content-Type", "application/json")
 	if err = json.NewEncoder(w).Encode(patient); err != nil {
